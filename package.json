@@ -1,0 +1,14 @@
+{
+    "name": "bit-pandora",
+    "version": "1.0.0",
+    "description": "Shut the box, Padroras box.",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "workspaces":[
+      "packages/*"
+    ],
+    "author": "Cal Shoemaker",
+    "license": "MIT"
+  }  
