@@ -13,17 +13,10 @@ const pandoraGetters = {
             rangeInTiles.add(total)
         }
 
-        // NOTE: Maybe a better way to do this...
-        tiles.reduce((last:number, current:number) => {
-            if(dice && dice.indexOf(current) >= 0){
-                rangeInTiles.add(current);
-            }
-
-            if(dice && dice.indexOf(last) >= 0){
-                rangeInTiles.add(last);
-            }
-
-            return current;
+        tiles.forEach(tile => {
+            if(dice && dice.indexOf(tile) >= 0){
+                rangeInTiles.add(tile);
+            } 
         });
 
         return [...rangeInTiles];
