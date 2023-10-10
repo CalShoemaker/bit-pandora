@@ -8,7 +8,6 @@ const pandoraGetters = {
         let total = dice ? dice.reduce((acc:number, cur:number) => acc + cur) : 0;
         let totalInTiles = tiles.indexOf(total);
         let rangeInTiles = new Set();
-        
         if(totalInTiles >= 0){
             rangeInTiles.add(total)
         }
@@ -20,7 +19,6 @@ const pandoraGetters = {
         });
 
         return [...rangeInTiles];
-
     },
     series: (state:DefaultGameState) => state.series,
     lastInSeries: (state:DefaultGameState) => state.series[state.series.length - 1],
