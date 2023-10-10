@@ -2,6 +2,7 @@
   <div class="mt-10 text-3xl mx-auto max-w-6xl">
     <div>total: {{ total }}</div>
     <div>dice: {{ lastInSeries }}</div>
+    <div>canPlay: {{ canPlay }} </div>
     <ul class="grid grid-cols-3 gap-2">
       <li v-for="(number, index) in defaultRange" v-bind:key="index">
         <button v-on:click="remove(number)" :disabled="!canRemove(number)">{{ number }}</button>
@@ -27,7 +28,8 @@
         'tiles', 
         'total', 
         'series',
-        'lastInSeries'
+        'lastInSeries',
+        'canPlay'
       ])
     },
     methods: {
