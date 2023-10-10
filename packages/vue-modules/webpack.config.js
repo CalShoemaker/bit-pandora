@@ -49,7 +49,9 @@ module.exports = (_, argv) => ({
       name: "vue_modules",
       filename: "remoteEntry.js",
       remotes: {},
-      exposes: {},
+      exposes: {
+        "./Game": "./src/components/Game.vue"
+      },
       shared: require("./package.json").dependencies,
     }),
     new HtmlWebPackPlugin({
