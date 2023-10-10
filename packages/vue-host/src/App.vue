@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-  import { mapGetters } from 'vuex';
+  import { mapGetters, mapActions } from 'vuex';
   export default {
     data(){
       return {
@@ -23,7 +23,7 @@
     },
     components: {},
     computed: {
-      ...mapGetters([
+      ...mapGetters('pandoraModule', [
         'tiles', 
         'total', 
         'series',
@@ -31,17 +31,14 @@
       ])
     },
     methods: {
-      remove(n:number) {
-        this.$store.commit("remove", n);
-      },
+      ...mapActions('pandoraModule', [
+        'remove', 
+        'reset', 
+        'rollDie'
+      ]),
+
       canRemove(n:number) {
         return this.tiles.indexOf(n) >= 0 ? true : false;
-      },
-      rollDie(n:number = 1) {
-          this.$store.commit("rollDie", n);
-      },
-      reset(){
-        this.$store.commit('reset');
       }
     }
   }
