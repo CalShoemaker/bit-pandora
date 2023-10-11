@@ -48,7 +48,9 @@ module.exports = (_, argv) => ({
     new ModuleFederationPlugin({
       name: "vue_modules",
       filename: "remoteEntry.js",
-      remotes: {},
+      remotes: {
+        vue_host: "vue_host@http://localhost:8080/remoteEntry.js"
+      },
       exposes: {
         "./Game": "./src/components/Game.vue"
       },

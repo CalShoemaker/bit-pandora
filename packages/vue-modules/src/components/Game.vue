@@ -15,25 +15,25 @@
 <script lang="ts">
     import { mapGetters, mapActions } from 'vuex';
     import { defineComponent } from 'vue';
-
+    
     export default defineComponent({
         data(){
-        return {
-            defaultRange: [1,2,3,4,5,6,7,8,9],
-            availableRange:[]
-        }
+            return {
+                defaultRange: [1,2,3,4,5,6,7,8,9],
+                availableRange:[]
+            }
         },
         components: {
-
+            
         },
         computed: {
-        ...mapGetters('pandoraModule', [
-            'tiles', 
-            'total', 
-            'series',
-            'lastInSeries',
-            'canPlay'
-        ])
+            ...mapGetters('pandoraModule', [
+                'tiles', 
+                'total', 
+                'series',
+                'lastInSeries',
+                'canPlay'
+            ])
         },
         methods: {
             ...mapActions('pandoraModule', [

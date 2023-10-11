@@ -1,6 +1,7 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const { VueLoaderPlugin } = require("vue-loader");
+const deps = require("./package.json");
 
 module.exports = (_, argv) => ({
   output: {
@@ -51,8 +52,26 @@ module.exports = (_, argv) => ({
       remotes: {
         vue_modules:"vue_modules@http://localhost:8079/remoteEntry.js"
       },
-      exposes: {},
-      shared: require("./package.json").dependencies,
+      exposes: {
+        "./store": "./src/store/index.ts"
+      },
+      shared: {
+        vue: {
+          eager: true,
+          singleton: true,
+          requiredVersion: deps.vue
+        },
+        "vue-router": {
+          eager: true,
+          singleton: true,
+          requiredVersion: deps["vue-router"]
+        },
+        vuex: {
+          eager: true,
+          singleton: true,
+          requiredVersion: deps["vuex"]
+        },
+      },
     }),
     new HtmlWebPackPlugin({
       template: "./src/index.html",
