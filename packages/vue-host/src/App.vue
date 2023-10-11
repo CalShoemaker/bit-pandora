@@ -8,13 +8,15 @@
 <script lang="ts">
   import { mapGetters } from 'vuex';
   import { defineComponent, defineAsyncComponent } from 'vue';
+  // @ts-ignore 
+  import Game from "vue_modules/Game";
 
   export default defineComponent({
     data(){
       
     },
     components: {
-      Game: defineAsyncComponent(() => import("vue_modules/Game"))
+      Game
     },
     computed: {
       ...mapGetters('pandoraModule', [
