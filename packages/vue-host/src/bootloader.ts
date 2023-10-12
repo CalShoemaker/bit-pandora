@@ -2,7 +2,10 @@ import { createApp } from "vue";
 
 import "./index.scss";
 import App from "./App.vue";
-import store from "./store";
+//import store from "./store";
+//@ts-ignore
+import store from 'vue_store/store';
+
 
 // Quick question:
 createApp(App)      // Why do devs

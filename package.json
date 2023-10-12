@@ -4,7 +4,8 @@
     "description": "Shut the box, Padroras box.",
     "main": "index.js",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "boot": "(cd packages/vue-store && npm run start) & (cd packages/vue-modules && npm run start) & (cd packages/vue-host && npm run start)"
     },
     "workspaces":[
       "packages/*"

@@ -50,10 +50,11 @@ module.exports = (_, argv) => ({
       name: "vue_host",
       filename: "remoteEntry.js",
       remotes: {
+        vue_store: "vue_store@http://localhost:8078/remoteEntry.js",
         vue_modules:"vue_modules@http://localhost:8079/remoteEntry.js"
       },
       exposes: {
-        "./store": "./src/store/index.ts"
+        // "./store": "./src/store/index.ts" //
       },
       shared: {
         vue: {

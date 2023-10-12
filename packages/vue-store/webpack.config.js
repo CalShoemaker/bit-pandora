@@ -4,7 +4,7 @@ const { VueLoaderPlugin } = require("vue-loader");
 
 module.exports = (_, argv) => ({
   output: {
-    publicPath: "http://localhost:8079/",
+    publicPath: "http://localhost:8078/",
   },
 
   resolve: {
@@ -12,7 +12,7 @@ module.exports = (_, argv) => ({
   },
 
   devServer: {
-    port: 8079,
+    port: 8078,
     historyApiFallback: true,
   },
 
@@ -46,14 +46,14 @@ module.exports = (_, argv) => ({
   plugins: [
     new VueLoaderPlugin(),
     new ModuleFederationPlugin({
-      name: "vue_modules",
+      name: "vue_store",
       filename: "remoteEntry.js",
       remotes: {
-        vue_store: "vue_store@http://localhost:8078/remoteEntry.js",
-        vue_host: "vue_host@http://localhost:8080/remoteEntry.js"
+        vue_store: "vue_store@http://localhost:8078/remoteEntry.js"
       },
       exposes: {
-        "./Game": "./src/components/Game.vue"
+        "./store": "./src/store/",
+        "./core": "./src/App"
       },
       shared: require("./package.json").dependencies,
     }),
