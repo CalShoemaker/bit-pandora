@@ -1,18 +1,12 @@
 import { createApp } from "vue";
 
-import "./index.scss";
+// Main Layout
 import App from "./App.vue";
-//import store from "./store";
+
 //@ts-ignore
 import store from 'vue_store/store';
+import "./index.scss";
+import router from "./routes";
 
 
-// Quick question:
-createApp(App)      // Why do devs
-    .use(store)     // split lines
-    .mount("#app"); // under 100 columns?
-
-// Is it really _that_ much more readable?
-// Answer: This pattern supports scalability
-// as today this may be three lines, but
-// next year it may be 30. 
+createApp(App).use(router).use(store).mount("#app");
