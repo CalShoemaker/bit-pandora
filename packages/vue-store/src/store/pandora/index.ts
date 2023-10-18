@@ -2,21 +2,54 @@ import pandoraMutations from './mutations';
 import pandoraGetters from './getters';
 import pandoraActions from './actions';
 
-export type DefaultGameState = {
-    series: Array<Array<number>>,
-    tiles: Array<number>
+// Game Status shape
+interface GameStatus {
+    finish?: string,
+    win: boolean,
+    active: boolean,
+    final: Array<number>,
+    score: number
 }
 
+// Player type
+export type Player = {
+    name?: string,
+    games?: {
+        current?: any,
+        history?: any,
+    }
+}
+
+// Game shape
+export type GameState = {
+    id: number,
+    type: string,
+    status: GameStatus,
+    canPlay?: Array<Set<number>>,
+    players?: Array<Player>,
+    history?: Array<Array<number>>,
+    tiles: Array<number>,
+}
+
+// Default game
 export const defaultGame = ()=> { 
-    return { 
-        series:[],
+    return {
+        id: 0,
+        type: 'DEFAULT',
+        canPlay: [],
+        players: [],
+        history: [],
+        status: { 
+            win: false,
+            active: false,
+            final: [],
+            score: 45
+        },
         tiles: [1, 2, 3, 4, 5, 6, 7, 8, 9]
     }
 }
 
-export const Die = (min:number, max:number) => min + Math.floor(Math.random() * (max - min + 1)); 
-
-const DefualtState:DefaultGameState = defaultGame();
+const DefualtState:GameState = defaultGame();
 
 const pandoraModule = {
     namespaced: true,
