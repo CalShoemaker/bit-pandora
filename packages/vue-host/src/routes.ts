@@ -2,8 +2,8 @@ import { defineAsyncComponent } from 'vue';
 
 // Routes
 import Home from "./components/Home.vue";
-
 const Game = () => import("vue_modules/Game");
+const NewGame = () => import("vue_modules/NewGame");
 
 import * as VueRouter from 'vue-router';
 
@@ -11,10 +11,10 @@ const routes = [{
     path: '/',
     component: Home
 },{
-    path: "/game",
-    component: Game,
+    path: "/newgame",
+    component: NewGame,
 },{
-    path: "/game/:id",
+    path: "/game/:id/:pid",
     component: Game,
     props: true
 }];

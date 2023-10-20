@@ -35,6 +35,11 @@ export class ApiController {
     return this.gameService.getAll();
   }
 
+  @Post('/player')
+  createPlayer(@Body() config) {
+    return this.gameService.NewPlayer(config);
+  }
+
   @Get('/:id')
   async findByOne(@Param('id') id): Promise<any> {
     return this.gameService.getById(id);

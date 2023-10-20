@@ -139,6 +139,7 @@ export class GameService {
         }
 
         const { tiles, history, canPlay } = this.getById(id);
+        
         const lastInHistory = history[history.length - 1];
         const _lastInHistory = lastInHistory.reduce((b, a) => b + a, 0);
         const _solution = solution.reduce((b, a) => b + a, 0);
@@ -161,9 +162,11 @@ export class GameService {
     }
     
     // New Player
-    public newPlayer(config?: Player) {
+    public NewPlayer(config?: Player) {
+        const pid = new Date().valueOf();
         return {
-            name: config?.name || "Player 1",
+            name: config?.name,
+            pid,
             games: {
                 current: null,
                 history: []
@@ -173,10 +176,8 @@ export class GameService {
 
     // New Quick Game
     public NewQuickGame(config: QuickGame) {
-        const { player, name, type } = config;
-
-        const user = player ? player : this.newPlayer({ name });
-        const game = this.newGame(user, type);
+        const { player, type } = config;
+        const game = this.newGame(player, type);
 
         return game as GameState;
     }
@@ -252,7 +253,7 @@ export class GameService {
         backtrack([], 0, 0);
     
         // Cast to set for first dedupe
-        let dedupe = result.filter(set=>set[0]!==set[1]);
+        let dedupe = result.filter(set => set[0] !== set[1]);
         
         // Shrink the set to only include 2 tiles as well as single solution tile
         let shrink = dedupe.filter(set => set[0] === target || set.length > 1 && set.length < 3);
@@ -260,6 +261,6 @@ export class GameService {
         // Remove remainder sets that don't sum to total
         let reduce = shrink.filter(set => [...set].reduce((p, a) => p + a, 0) === target);
     
-        return reduce;
+        return [...reduce, target];
     }    
 }
