@@ -51,8 +51,8 @@
                 const flatSelected = this.selected.flat();
                 const sumFlatSelected = flatSelected.reduce((p, a) => p+ a, 0);
                 const nSum = sumFlatSelected + n;
-                
-                if(config.pickLimit){
+
+                if(config.pickLimit !== -1){
                     if(this.tiles.includes(n) && this.selected.length < 2 && flatCanPlay ){
                         this.selected.push(n);
                     } 

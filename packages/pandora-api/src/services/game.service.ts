@@ -89,7 +89,6 @@ export class GameService {
 
         const hasPlay = this.solutionSpace([...tiles], total);
 
-
         // TODO: Abstract game status update out
         // BL: First play activates game 
         status.active = history.length === 1 ? true : status.active;
@@ -261,6 +260,6 @@ export class GameService {
         // Remove remainder sets that don't sum to total
         let reduce = shrink.filter(set => [...set].reduce((p, a) => p + a, 0) === target);
     
-        return [...reduce, target];
+        return reduce;
     }    
 }
