@@ -1,23 +1,11 @@
 <template>
-    <div class="flex flex-col">
-        <div>canPlay: {{ canPlay }} </div>
-        <Tiles :player="player" :id="id" />
-        <!-- <div class="grid grid-cols-3 gap-2" 
-             @dragover.prevent
-             @drop="handleDrop($event)"
-            >
-            <div class="flip-card" :class="{ selected: selected.includes(number), taken:!tiles.includes(number), }" v-for="(number, index) in range" v-bind:key="index" >
-                <div class="flip-card-inner flex items-center justify-center" v-on:click="select(number)">
-                    <div class="flip-card-front flex items-center justify-center">
-                        {{ number }}
-                    </div>
-                    <div class="flip-card-back flex items-center justify-center">
-                        {{ number }}
-                    </div>
-                </div>
-            </div> 
-            
-        </div> -->
+    <div class="flex flex-col mt-5">
+        <Cube>
+            <template v-slot:game>
+                <Tiles :player="player" :id="id" />
+            </template>
+        </Cube>
+        
         <div>
             <template v-if="status && status.win || status && status.lose">
                 <h2>Game Over {{ player.name || "booo" }}, You {{ status.win ? "WIN" : "LOSE" }}!</h2>
@@ -35,6 +23,7 @@
     import { defineComponent } from 'vue';
     import Player from './Player.vue';
     import Tiles from './Tiles.vue';
+    import Cube from './Cube.vue';
 
     export default defineComponent({
         props: ['id', 'pid'],
@@ -100,7 +89,8 @@
         },
         components: {
             Player,
-            Tiles
+            Tiles,
+            Cube
         }
   })
 </script>

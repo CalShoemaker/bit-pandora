@@ -1,5 +1,5 @@
 <template>
-    <header class="flex p-2 bg-blue-800 text-white">
+    <header class="flex p-2 bg-gray-900 text-white">
       <div class="grow p-2">Bit Pandora</div>
     </header>
 </template>

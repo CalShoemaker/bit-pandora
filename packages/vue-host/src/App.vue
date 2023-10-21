@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex min-h-screen flex-col overflow-hidden bg-gradient-to-t from-blue-900 via-indigo-900 to-gray-900">
+  <div class="relative flex min-h-screen flex-col overflow-hidden bg-gray-800">
     <Header class="sticky top-0 z-50" />
     <div class="relative sm:mx-auto">
       <router-view @do-link="doLink"></router-view>

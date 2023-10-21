@@ -1,6 +1,6 @@
 <template>
-    <div class="grid grid-cols-3 gap-2" @dragover.prevent>
-        <div class="flip-card" :class="{ selected: selected.includes(number), taken:!tiles.includes(number), }" v-for="(number, index) in range" v-bind:key="index" >
+    <div class="grid grid-cols-3 facet" @dragover.prevent>
+        <div class="flip-card lament" :class="{ selected: selected.includes(number), taken:!tiles.includes(number), }" v-for="(number, index) in range" v-bind:key="index" >
             <div class="flip-card-inner flex items-center justify-center" v-on:click="select(number)">
                 <div class="flip-card-front flex items-center justify-center">
                     {{ number }}
@@ -42,13 +42,13 @@
                 const config = {
                     pickLimit: -1
                 };
-                
+                const last = this.history[this.history.length-1] || [];
                 const flatCanPlay = this.canPlay.flat();
                 const inFlatCanPlay = flatCanPlay.includes(n);
                 const flatSelected = this.selected.flat();
                 const sumFlatSelected = flatSelected.reduce((p, a) => p+ a, 0);
                 const nSum = sumFlatSelected + n;
-                const dSum = (this.history[this.history.length-1]).reduce((p:number, a:number) => p + a, 0);
+                const dSum = last.reduce((p:number, a:number) => p + a, 0);
                 const maxCanPlay = Math.max(...flatCanPlay) > dSum ? Math.max(...flatCanPlay) :dSum;
 
                 if(config.pickLimit !== -1){
@@ -82,55 +82,96 @@
         }
     })
 </script>
-<style>
+<style lang="scss">
+.facet {
+    background: rgba(0, 0, 0, 70%);
+    box-shadow: 0px 0 1px 1px gold;
+    animation: glow 10s infinite ease-in-out;
+}
 .flip-card {
-  background-color: transparent;
-  width: 150px;
-  height: 100px;
-  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+    background-color: transparent;
+    width: 150px;
+    height: 150px;
+    perspective: 1000px; /* Remove this if you don't want the 3D effect */
+    
+    /* Do an horizontal flip when you move the mouse over the flip box container */
+    &:hover,
+    &.selected, 
+    &.taken  {
+        .flip-card-inner{
+            transform: rotateY(180deg);
+        }
+    }
+    &.taken {
+        .flip-card-back{
+            background-color: navy;
+        }
+    }
+
+    &.lament {
+        .flip-card-front {
+            color: black;
+            background-image: url('../media/images/lament-config.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 470px;
+            background-position: -162px -27px;
+        }
+
+        /* Style the back side */
+        .flip-card-back {
+            background-image: url('../media/images/lament-config.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: 470px;
+            background-position: -10px -178px; 
+            font-weight: bold;
+            font-size: 1.2em;
+            transform: rotateY(180deg);
+        }
+
+        &.taken{
+            .flip-card-back { color:gold; background-position: -162px -177px; }
+        }
+    }
+
+    /* This container is needed to position the front and back side */
+    .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.8s;
+        transform-style: preserve-3d;
+
+        /* Position the front and back side */
+        .flip-card-front, 
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+        }
+
+    }
 }
 
-/* This container is needed to position the front and back side */
-.flip-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  transition: transform 0.8s;
-  transform-style: preserve-3d;
-}
-
-/* Do an horizontal flip when you move the mouse over the flip box container */
-.flip-card:hover .flip-card-inner,
-.selected  .flip-card-inner,
-.taken  .flip-card-inner{
-  transform: rotateY(180deg);
-}
-
-
-/* Position the front and back side */
-.flip-card-front, .flip-card-back {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  -webkit-backface-visibility: hidden; /* Safari */
-  backface-visibility: hidden;
-}
-
-/* Style the front side (fallback if image is missing) */
-.flip-card-front {
-  background-color: #bbb;
-  color: black;
-}
-
-/* Style the back side */
-.flip-card-back {
-  background-color: dodgerblue;
-  color: white;
-  transform: rotateY(180deg);
-}
-
-.taken .flip-card-back{
-    background-color: navy;
+@keyframes glow {
+  0% {
+    box-shadow: 0px 0 2px 1px gold;
+  }
+  25% {
+    box-shadow: 0px 0 6px 3px gold;
+  }
+  50% {
+    box-shadow: 0px 0 10px 5px gold;
+  }
+  75% {
+    box-shadow: 0px 0 6px 3px gold;
+  }
+  100% {
+    box-shadow: 0px 0 2px 1px gold;
+  }
 }
 </style>
