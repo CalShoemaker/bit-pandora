@@ -32,25 +32,6 @@
             selected: [] as Array<string>
         }
     },
-    setup(props){
-        const handleDragStart = (event:DragEvent) => {
-            console.log("dragStart", event);
-            if(event && event.dataTransfer && event.dataTransfer.effectAllowed){
-                event.dataTransfer.effectAllowed = 'move';
-            }
-        }
-
-        const handleDrag = (e:any) => {
-            console.log("drag", e);
-        }
-
-
-        const handleDrop = (event:DragEvent) => {
-            console.log("drop",event);
-        }
-
-        return { handleDrag, handleDrop }
-    },
     computed: {
         ...mapGetters('pandoraModule', [
             'gid',
@@ -73,9 +54,10 @@
         },
         handleDragStart(event:DragEvent){
             this.rolling = true;
-            console.log("dragStart", event);
             if(event && event.dataTransfer && event.dataTransfer.effectAllowed){
                 event.dataTransfer.effectAllowed = 'move';
+                const img = new Image();
+                event.dataTransfer.setDragImage(img, -99999, -99999);
             }
             this.rollDice(this.player, this.gid, this.selected.length);
         },
@@ -90,7 +72,6 @@
             } else {
                 this.selected.push(id);
             }
-            console.log(e, this.selected)
         }
     }
   });

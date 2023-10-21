@@ -1,8 +1,7 @@
 <template>
-  
-  <div class="relative flex min-h-screen flex-col justify-center overflow-hidden bg-gradient-to-t from-blue-900 via-indigo-900 to-gray-900">
-    <Header />
-    <div class="relative bg-blue-200 shadow-xl ring-1 ring-gray-900/5 sm:mx-auto">
+  <div class="relative flex min-h-screen flex-col overflow-hidden bg-gradient-to-t from-blue-900 via-indigo-900 to-gray-900">
+    <Header class="sticky top-0 z-50" />
+    <div class="relative sm:mx-auto">
       <router-view @do-link="doLink"></router-view>
     </div>
   </div>
@@ -17,15 +16,7 @@
   // TODO: Background gradient with this color: 70c1b3
   export default defineComponent({
     computed: {
-      // ...mapGetters('pandoraModule', [
-      //     'gid',
-      //     'tiles', 
-      //     'total', 
-      //     'history',
-      //     'players',
-      //     'canPlay',
-      //     'status'
-      // ])
+
     }, 
     methods: {
       doLink(target:string) {

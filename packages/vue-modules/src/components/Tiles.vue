@@ -1,7 +1,5 @@
 <template>
-    <div class="grid grid-cols-3 gap-2" 
-         @dragover.prevent
-        >
+    <div class="grid grid-cols-3 gap-2" @dragover.prevent>
         <div class="flip-card" :class="{ selected: selected.includes(number), taken:!tiles.includes(number), }" v-for="(number, index) in range" v-bind:key="index" >
             <div class="flip-card-inner flex items-center justify-center" v-on:click="select(number)">
                 <div class="flip-card-front flex items-center justify-center">
@@ -44,19 +42,19 @@
                 const config = {
                     pickLimit: -1
                 };
-
+                
                 const flatCanPlay = this.canPlay.flat();
                 const inFlatCanPlay = flatCanPlay.includes(n);
-                const maxCanPlay = Math.max(...flatCanPlay);
                 const flatSelected = this.selected.flat();
                 const sumFlatSelected = flatSelected.reduce((p, a) => p+ a, 0);
                 const nSum = sumFlatSelected + n;
+                const dSum = (this.history[this.history.length-1]).reduce((p:number, a:number) => p + a, 0);
+                const maxCanPlay = Math.max(...flatCanPlay) > dSum ? Math.max(...flatCanPlay) :dSum;
 
                 if(config.pickLimit !== -1){
                     if(this.tiles.includes(n) && this.selected.length < 2 && flatCanPlay ){
                         this.selected.push(n);
                     } 
-
                     if( this.selected.length === 2 || maxCanPlay === n){
                         this.pick();
                     }
@@ -66,7 +64,7 @@
                     } else if(nSum === maxCanPlay){
                         this.selected.push(n);
                         this.pick();
-                    } else {
+                    } else if(inFlatCanPlay) {
                         this.selected.push(n);
                     }
                 }

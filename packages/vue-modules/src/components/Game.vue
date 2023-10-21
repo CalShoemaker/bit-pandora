@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col bg-blue-200">
+    <div class="flex flex-col">
         <div>canPlay: {{ canPlay }} </div>
         <Tiles :player="player" :id="id" />
         <!-- <div class="grid grid-cols-3 gap-2" 

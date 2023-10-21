@@ -251,15 +251,18 @@ export class GameService {
       
         backtrack([], 0, 0);
     
-        // Cast to set for first dedupe
-        let dedupe = result.filter(set => set[0] !== set[1]);
-        
+        const removeDuplicates = (ar:Array<number>) => ar.filter((n,i) => ar.indexOf(n) === i);
+        let undupe = [];
         // Shrink the set to only include 2 tiles as well as single solution tile
-        let shrink = dedupe.filter(set => set[0] === target || set.length > 1 && set.length < 3);
-        
+        let shrink = result.filter(set => set[0] === target || set.length > 1); //  && set.length < 3
+        shrink.forEach((a) => undupe.push(removeDuplicates(a)));
+
+        // Cast to set for first dedupe
+        let dedupe = undupe.filter(set => (set.length > 1 ? set[0] !== set[1] : true));
+
         // Remove remainder sets that don't sum to total
-        let reduce = shrink.filter(set => [...set].reduce((p, a) => p + a, 0) === target);
-    
+        let reduce = dedupe.filter(set => set.reduce((p, a) => p + a, 0) === target);
+        
         return reduce;
     }    
 }
