@@ -69,27 +69,10 @@ export class ApiController {
       this.eventsService.emit(game);
       return game;
   }
-
+  
   @Sse('/:id/channel')
   channel(@Request() req) {
     return this.eventsService.subscribe();
   }
-
-  // createMessage(message): Observable<Object> {
-
-  //   return this.http.post('http://localhost:3000/messages', {
-  //     content: message.content,
-  //     submittedBy: message.submittedBy
-  //   });
-
-  // }
-
-  // @Get('game/:type/:player')
-  // async game(@Param('player') player, @Param('type') type) {
-  //   this.gameService.NewQuickGame()
-  //   this.eventsService.emit({emitting: created});
-  //   return {ok: true};
-  // }
-  
 }
 

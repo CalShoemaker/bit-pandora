@@ -14,9 +14,6 @@
                 name:''
             }
         },
-        computed:{
-
-        },
         methods: {
             ...mapActions('pandoraModule', [
                 'init',
@@ -27,8 +24,6 @@
                 console.log(this.name)
                 if(this.name.length > 2){
                     this.newPlayer(this.name).then(UserPlayer => {
-
-                console.log(UserPlayer)
                         this.init({ player:UserPlayer, type:"QUICK" }).then(game=>{
                             this.$emit('doLink', 'game/' + game.id + '/' + UserPlayer.pid);
                         })
