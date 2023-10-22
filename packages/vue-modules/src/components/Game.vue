@@ -1,11 +1,11 @@
 <template>
-    <div class="flex flex-col mt-5">
-        <Cube>
+    <div class="flex flex-col mt-5" ref="scene">
+        <Cube v-if="false">
             <template v-slot:game>
                 <Tiles :player="player" :id="id" />
             </template>
         </Cube>
-        
+        <Tiles v-else :player="player" :id="id" />
         <div>
             <template v-if="status && status.win || status && status.lose">
                 <h2>Game Over {{ player.name || "booo" }}, You {{ status.win ? "WIN" : "LOSE" }}!</h2>
@@ -20,29 +20,28 @@
 </template>
 <script lang="ts">
     import { mapGetters, mapActions } from 'vuex';
-    import { defineComponent } from 'vue';
+    import { defineComponent, ref } from 'vue';
     import Player from './Player.vue';
     import Tiles from './Tiles.vue';
     import Cube from './Cube.vue';
-
+    
     export default defineComponent({
         props: ['id', 'pid'],
         data(){
             return {
+                isFullscreen: false,
                 range: [1,2,3,4,5,6,7,8,9],
                 selected: [] as Array<number>
             }
         },
+        setup() {
+            const scene = ref(null);
+            return { scene };
+        },
         created() {
             if(this.id){
-                this.setup(this.id).then(data=>{console.log("setup",data)});
+                this.setup(this.id)
             }
-        },
-
-        beforeDestroy() {
-            // if(this.channel){
-            //     this.channel.close();
-            // }
         },
         watch: {
             // Watches the gameid and navigates to new game
@@ -76,6 +75,11 @@
                 'init',
                 'setup'
             ]),
+            fullScreen(){
+                if(this.scene){
+                 
+                }
+            },
             gotoGame(gid: number) {
                 this.$emit('doLink', "/game/" + gid + '/' + this.player.pid);
             },
