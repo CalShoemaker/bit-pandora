@@ -7,11 +7,6 @@
   import { defineComponent } from 'vue';
 
   export default defineComponent({
-    methods: {
-      doLink(target:string) {
-        console.log("do link", target);
-        this.$router.push(target)
-      }
-    }
+
   })
 </script>

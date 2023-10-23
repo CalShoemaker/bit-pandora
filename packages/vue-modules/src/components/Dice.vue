@@ -1,12 +1,9 @@
 <template>
-    <h2>range:{{ range }}</h2>
-    <h3>selected: {{ selected }}</h3>
-    <h4>can play: {{ canPlay }}</h4>
-    <div class="container dice-box" 
-        v-touch:hold="handleHold"
+    <div class="relative flex flex-auto dice-box" 
         v-touch:swipe="handleSwipeUp"
         @pointerdown="pointerDown"
         @pointerup="pointerUp">
+
         <div class="dice-wrap"
             v-for="(die, d) in dice"
             v-touch:swipe="handleSwipeUp"  
@@ -15,6 +12,7 @@
                 selected: inSelected(d), 
                 rolling: rolling && inSelected(d)
             }">
+
             <div class="dice" 
                 v-bind:key="d" 
                 :class="['dice-' + proper[d], showDie(d, die)]">
@@ -22,30 +20,38 @@
                     <div v-for="(dot, i) in side" class="dot" :class="[proper[side-1] + '-' + dot]" v-bind:key="i"></div>
                 </div>
             </div> 
-    </div>
+        </div>
     </div>
 </template>
 <script lang="ts">
     // https://lenadesign.org/2020/06/18/roll-the-dice/
     import { mapGetters, mapActions } from 'vuex';
-    import { defineComponent, ref } from 'vue';
-    const rolling = ref(false);
+    import { defineComponent, ref, reactive } from 'vue';
+    
+
     export default defineComponent({
     props: ['id','player'],
-    data(){
+    setup() {
+        const rolling = ref(false);
+        const dice = reactive([1,6]);
+        const proper = reactive(['one', 'two', 'three', 'four', 'five', 'six']);
+        const selected = reactive([]);
+
+        const pointer = reactive({
+            active:false,
+            last:0,
+            newPosX:0, 
+            newPosY:0, 
+            startPosX:0, 
+            startPosY:0
+        });
+
         return {
-            dice: [1,6],
+            proper,
             rolling,
-            pointer: {
-                active:false,
-                last:0,
-                newPosX:0, 
-                newPosY:0, 
-                startPosX:0, 
-                startPosY:0
-            },
-            proper:['one', 'two', 'three', 'four', 'five', 'six'],
-            selected: [] as Array<number>
+            dice,
+            pointer,
+            selected
         }
     },
     computed: {
@@ -74,39 +80,25 @@
             if(this.player && this.id) this.Cast({player, id, d});
         },
         pointerDown(e:Event) {
-            // this.pointer.startPosX = e.screenX;
-            // this.pointer.startPosY = e.screenY;
             this.pointer.active = true;
-            this.rolling=true;
+            this.rolling = true;
             this.pointer.last = new Date().valueOf();
+            setTimeout(() => {
+                if(this.rolling){
+                    this.pointerUp();
+                }
+            }, 4000);
         },
-        pointerMove(e:Event){
-        //     if(this.pointer.active){
-        //     console.log(e)
-        //     // calculate the new position
-        //     this.pointer.newPosX = this.pointer.startPosX - e.screenX;
-        //     this.pointer.newPosY = this.pointer.startPosY - e.screenY;
-
-        //     // with each move we also want to update the start X and Y
-        //     this.pointer.startPosX = e.screenX;
-        //     this.pointer.startPosY = e.screenY;
-        //     console.log(e.target)
-        //     // set the element's new position:
-        //     e.target.style.top = (e.target.offsetTop - this.pointer.newPosY) + "px";
-        //     e.target.style.left = (e.target.offsetLeft - this.pointer.newPosX) + "px";
-        // }
-        },
-        pointerUp(){
+        pointerUp() {
             this.rolling = false;
             const pointer = new Date().valueOf();
+
             if(pointer > this.pointer.last + 1000){
                 this.pointer.last = pointer;
                 this.rollDice(this.player, this.id, this.selected.length);
             }
-            this.pointer.active=false;
-        },
-        handleHold(){
 
+            this.pointer.active = false;
         },
         handleTap(id:number){
             if(this.canPlay.length > 0) return;
@@ -120,9 +112,6 @@
             }
 
             return handler;
-        },
-        mounted(){
-
         },
         handleSwipeUp(){
             if(this.player && this.id){

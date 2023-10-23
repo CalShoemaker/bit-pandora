@@ -1,11 +1,11 @@
 <template>
-    <div class="flex flex-col mt-5">
+    <div class="flex flex-col">
         <Cube v-if="false">
             <template v-slot:game>
                 <Tiles :player="player" :id="id" />
             </template>
         </Cube>
-        <Tiles v-else :player="player" :id="id" />
+        <Tiles v-else :player="player" :id="id" class="tiles" />
         <div>
             <template v-if="status && status.win || status && status.lose">
                 <h2>Game Over {{ player.name || "booo" }}, You {{ status.win ? "WIN" : "LOSE" }}!</h2>
@@ -98,3 +98,8 @@
         }
   })
 </script>
+<style>
+.tiles {
+    margin-top:120px;
+}
+</style>
