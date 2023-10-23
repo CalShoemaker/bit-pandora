@@ -1,104 +1,175 @@
 <template>
-    <div class="diced"             
-         draggable="true" 
-         @dragstart="handleDragStart"
-         @dragend="handleDragEnd" 
-         @click="handleClick" 
-         @tap="handleTap"
-         :class="[selected.includes('diced'+di) ? 'selected' :'']" 
-         @dragover.prevent 
-         v-for="(die, di) in range" :id="'diced' + di">
-        <div 
-             :id="'dice' + di" 
-             v-bind:key="di" 
-             class="dice" 
-             :class="['dice-' + proper[di],'show-' + die]"
-            >
-            <div v-for="(side, si) in 6" class='side' :class="[proper[side-1]]" v-bind:key="si" >
-                <div v-for="(dot, i) in side" class="dot" :class="[proper[side-1] + '-' + dot]" v-bind:key="i"></div>
-            </div>
-        </div> 
-   </div>
+    <h2>range:{{ range }}</h2>
+    <h3>selected: {{ selected }}</h3>
+    <h4>can play: {{ canPlay }}</h4>
+    <div class="container dice-box" 
+        v-touch:hold="handleHold"
+        v-touch:swipe="handleSwipeUp"
+        @pointerdown="pointerDown"
+        @pointerup="pointerUp">
+        <div class="dice-wrap"
+            v-for="(die, d) in dice"
+            v-touch:swipe="handleSwipeUp"  
+            v-touch="handleTap(d)" 
+            :class="{ 
+                selected: inSelected(d), 
+                rolling: rolling && inSelected(d)
+            }">
+            <div class="dice" 
+                v-bind:key="d" 
+                :class="['dice-' + proper[d], showDie(d, die)]">
+                <div v-for="(side, si) in 6" class='side' :class="[proper[side-1]]" v-bind:key="si" >
+                    <div v-for="(dot, i) in side" class="dot" :class="[proper[side-1] + '-' + dot]" v-bind:key="i"></div>
+                </div>
+            </div> 
+    </div>
+    </div>
 </template>
 <script lang="ts">
     // https://lenadesign.org/2020/06/18/roll-the-dice/
     import { mapGetters, mapActions } from 'vuex';
-    import { defineComponent } from 'vue';
-
+    import { defineComponent, ref } from 'vue';
+    const rolling = ref(false);
     export default defineComponent({
     props: ['id','player'],
     data(){
         return {
-            rolling: false,
+            dice: [1,6],
+            rolling,
+            pointer: {
+                active:false,
+                last:0,
+                newPosX:0, 
+                newPosY:0, 
+                startPosX:0, 
+                startPosY:0
+            },
             proper:['one', 'two', 'three', 'four', 'five', 'six'],
-            selected: [] as Array<string>
+            selected: [] as Array<number>
         }
     },
     computed: {
         ...mapGetters('pandoraModule', [
-            'gid',
             'history',
-            'players',
+            'canPlay'
         ]),
         range() {
-            // NOTE: Why can't we just make this a css3 animations?
-            // Some kind of shake function
-            const rnd = [[6,1], [5,2], [4,3]];
-            const rndi = Math.floor(Math.random() * (3) + 1);
-
             const h = this.history; // History
             const l = h.length -1; // Last
             const p = h[l]; // Playable
-            const d = p && p.length > 0 ? p : rnd[rndi];
-
-            return d;
+            return p ?? [];
         }
     },
     methods: {
         ...mapActions('pandoraModule', [
             'Cast'
         ]),
+        showDie(i:number, d:number){
+            return this.selected.includes(i) ? 'show-' + this.range[i] : "";
+        },
+        inSelected(i:number){
+            return this.selected.includes(i);
+        },
         rollDice(player:any, id:number, d:number){
-            this.Cast({player, id, d});
+            if(this.player && this.id) this.Cast({player, id, d});
         },
-        handleTap(e:Event){
-            alert("tap");
-            console.log(e)
+        pointerDown(e:Event) {
+            // this.pointer.startPosX = e.screenX;
+            // this.pointer.startPosY = e.screenY;
+            this.pointer.active = true;
+            this.rolling=true;
+            this.pointer.last = new Date().valueOf();
         },
-        handleDragStart(event:DragEvent){
-            this.rolling = true;
-            if(event && event.dataTransfer && event.dataTransfer.effectAllowed){
-                event.dataTransfer.effectAllowed = 'move';
-                const img = new Image();
-                event.dataTransfer.setDragImage(img, -99999, -99999);
-            }
-            this.rollDice(this.player, this.gid, this.selected.length);
+        pointerMove(e:Event){
+        //     if(this.pointer.active){
+        //     console.log(e)
+        //     // calculate the new position
+        //     this.pointer.newPosX = this.pointer.startPosX - e.screenX;
+        //     this.pointer.newPosY = this.pointer.startPosY - e.screenY;
+
+        //     // with each move we also want to update the start X and Y
+        //     this.pointer.startPosX = e.screenX;
+        //     this.pointer.startPosY = e.screenY;
+        //     console.log(e.target)
+        //     // set the element's new position:
+        //     e.target.style.top = (e.target.offsetTop - this.pointer.newPosY) + "px";
+        //     e.target.style.left = (e.target.offsetLeft - this.pointer.newPosX) + "px";
+        // }
         },
-        handleDragEnd(event:DragEvent) {
+        pointerUp(){
             this.rolling = false;
+            const pointer = new Date().valueOf();
+            if(pointer > this.pointer.last + 1000){
+                this.pointer.last = pointer;
+                this.rollDice(this.player, this.id, this.selected.length);
+            }
+            this.pointer.active=false;
         },
-        handleClick(e:Event){
-            this.rolling = true;
-            const { id } = e.target as HTMLInputElement;
-            if(this.selected.includes(id)){
-                const filtered = this.selected.filter(elem => elem !== id);
-                this.selected = filtered;
-            } else {
-                this.selected.push(id);
+        handleHold(){
+
+        },
+        handleTap(id:number){
+            if(this.canPlay.length > 0) return;
+            const handler = (direction:any, mouseEvent:Event) =>{
+                if(this.selected.includes(id)){
+                    const filtered = this.selected.filter(sid => sid !== id);
+                    this.selected = filtered;
+                } else {
+                    this.selected.push(id);
+                }
             }
 
-            this.rolling = false;
+            return handler;
+        },
+        mounted(){
+
+        },
+        handleSwipeUp(){
+            if(this.player && this.id){
+                this.rolling = false;
+                this.rollDice(this.player, this.id, this.selected.length);
+            } 
         }
     }
   });
 </script>
 <style>
+.container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-top:50px;
+}
+.dice-wrap {
+    scale: 75%;
+    position: relative;
+    display: inline-block;
+    min-width: 320px;
+    min-height: 100px;
+    left: 25%;
+}
+
 .dice {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  transform-style: preserve-3d;
-  transition: transform 1s; }
+    pointer-events: none;
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    transform-style: preserve-3d;
+    transition: transform 1s; 
+}
+
+.dice-wrap.rolling .dice-one{
+    animation: rolling 3s infinite ease-in-out;
+    animation-direction: alternate;
+    animation-delay: 500ms;
+}
+
+.dice-wrap.rolling .dice-two{
+    animation: rolling 3s infinite ease-in-out;
+    animation-direction: alternate-reverse;
+    animation-delay: 500ms;
+}
 
 .dot {
   position: absolute;
@@ -111,7 +182,7 @@
 
 .side {
   position: absolute;
-  background-color: #ffF;
+  background-color: rgba(255,255,255,0.7);
   border-radius:5px;
   width: 100px;
   height: 100px;
@@ -119,6 +190,17 @@
   text-align: center;
   line-height: 2em;
 }
+
+.dice-wrap.selected .side{
+    background-color: rgba(239,35,60, 0.7);
+    border: 1px solid #ef233c;;
+}
+
+.dice-wrap.selected .side .dot {
+    background-color: #fff;
+  box-shadow: inset 2px 2px #f2f2f2;
+}
+  
 
 .side:nth-child(1) {
   transform: translateZ(3.1em); }
@@ -167,37 +249,26 @@
   left: 80%; 
 }
 </style>
-<style lang="scss">
-
-.diced {
+<style lang="scss" noscript>
+.dice-wrap {
   position: relative;
   display: inline-block;
   min-width: 100px;
   min-height: 100px;
   &.selected {
     .side{
-        background-color: khaki;
-        box-shadow: 0 0 0 3px #70cdff;
+        
     }
   }
 }
 
 .dice {
-    position: relative;
+    position: absolute;;
     min-width: 100px;
     min-height: 100px;
     transform-style: preserve-3d;
     transition: transform 1s; 
     pointer-events: none;
-    transform:rotate3d(1, 1, 1, 45deg);
-
-    &.dice-one {
-        position: absolute;
-    }
-
-    &.dice-two {
-        position: absolute;
-    }
     
     .side {
         position: absolute;
@@ -241,6 +312,8 @@
 
 .show-1 { transform: rotateX(720deg) rotateZ(-720deg); }
 
+.show-2 { transform: rotateX(-900deg) rotateZ(1080deg); }
+
 .show-6 { transform: rotateY(-450deg) rotateZ(-1440deg); }
 
 .show-3 { transform: rotateY(810deg) rotateZ(720deg); }
@@ -249,7 +322,6 @@
 
 .show-5 { transform: rotateX(450deg) rotateZ(-720deg); }
 
-.show-2 { transform: rotateX(-900deg) rotateZ(1080deg); }
 
 .two-1, .three-1, .four-1, .five-1, .six-1 {
   top: 20%;
@@ -279,5 +351,22 @@
 .six-5 {
   top: 50%;
   left: 80%; 
+}
+@keyframes rolling {
+    0% {
+        transform: rotateX(720deg) rotateZ(-720deg);
+    }
+    25% {
+        transform: rotateX(-900deg) rotateZ(1080deg); 
+    }
+    50% {
+        transform: rotateY(-450deg) rotateZ(-1440deg);
+    }
+    75% {
+        transform: rotateX(-810deg) rotateZ(-1080deg);
+    }
+    100% {
+        transform: rotateX(450deg) rotateZ(-720deg); 
+    }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="bg-slate-50">
         <input v-model="name" placeholder="Player Name" />
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" v-on:click="newQuickGame()">New Quick Game</button>
     </div>

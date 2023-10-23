@@ -1,8 +1,6 @@
 <template>
-    <div class="flex p-2 bg-teal-800">
-      <div class="grow p-2">
+    <div class="flex">
         <Dice :id="id" :player="player" />
-      </div>
     </div>
 </template>
 <script lang="ts">
@@ -14,7 +12,6 @@
         props:['id', 'player'],
         computed: {
             ...mapGetters('pandoraModule', [
-                'gid',
                 'history',
                 'players',
                 'canPlay',

@@ -28,6 +28,7 @@
     </div>
 </template>
 <script lang="ts">
+    // https://medium.com/codex/pure-css-animation-1-3d-cubes-f8ecc53ef16e
     import { defineComponent } from 'vue';
 
     export default defineComponent({

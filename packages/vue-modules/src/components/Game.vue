@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col mt-5" ref="scene">
+    <div class="flex flex-col mt-5">
         <Cube v-if="false">
             <template v-slot:game>
                 <Tiles :player="player" :id="id" />

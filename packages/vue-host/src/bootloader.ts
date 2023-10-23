@@ -1,12 +1,18 @@
-import { createApp } from "vue";
-
-// Main Layout
-import App from "./App.vue";
-
 //@ts-ignore
 import store from 'vue_store/store';
-import "./index.scss";
+
+import { createApp } from "vue";
 import router from "./routes";
+import App from "./App.vue";
+import "./index.scss";
+import Vue3TouchEvents from "vue3-touch-events";
 
+const bitPandoraHost = createApp(App);
 
-createApp(App).use(router).use(store).mount("#app");
+bitPandoraHost.use(router);
+bitPandoraHost.use(Vue3TouchEvents,{
+    touchHoldTolerance: 1000
+});
+bitPandoraHost.use(store);
+bitPandoraHost.mount("#bitPandoraHost");
+
