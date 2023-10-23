@@ -6,7 +6,7 @@
             </template>
         </Cube>
         <Tiles v-else :player="player" :id="id" class="tiles" />
-        <div>
+        <div class="text-white">
             <template v-if="status && status.win || status && status.lose">
                 <h2>Game Over {{ player.name || "booo" }}, You {{ status.win ? "WIN" : "LOSE" }}!</h2>
                 <ul>

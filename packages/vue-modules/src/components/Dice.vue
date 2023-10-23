@@ -10,7 +10,8 @@
             v-touch="handleTap(d)" 
             :class="{ 
                 selected: inSelected(d), 
-                rolling: rolling && inSelected(d)
+                rolling: rolling && inSelected(d),
+                waiting: canPlay.length > 0 && inSelected(d)
             }">
 
             <div class="dice" 
@@ -76,7 +77,7 @@
         inSelected(i:number){
             return this.selected.includes(i);
         },
-        rollDice(player:any, id:number, d:number){
+        rollDice(player:any, id:number, d:number) {
             if(this.player && this.id) this.Cast({player, id, d});
         },
         pointerDown(e:Event) {
@@ -87,7 +88,7 @@
                 if(this.rolling){
                     this.pointerUp();
                 }
-            }, 4000);
+            }, 5000);
         },
         pointerUp() {
             this.rolling = false;
@@ -128,20 +129,25 @@
     bottom: 0;
     left: 0;
     right: 0;
-    padding-top:50px;
+    padding-top:70px;
 }
+
 .dice-wrap {
     scale: 75%;
     position: relative;
     display: inline-block;
-    min-width: 320px;
+    min-width: 100px;
     min-height: 100px;
     left: 25%;
+    top: 0;
+    transition: top 1s ease-in-out;
 }
 
 .dice {
     pointer-events: none;
     position: absolute;
+    top: 0;
+    left: 0;
     width: 100px;
     height: 100px;
     transform-style: preserve-3d;
@@ -159,6 +165,20 @@
     animation-direction: alternate-reverse;
     animation-delay: 500ms;
 }
+
+.dice-wrap.waiting {
+    position: absolute;
+    top: -65vh;
+    transition: top 1s ease-in-out;
+}
+
+.dice-wrap.waiting .dice {
+    animation: rolling 1s 1 ease-in-out;
+} 
+
+.dice-wrap.waiting .dice-two {
+    left: 120px;
+} 
 
 .dot {
   position: absolute;
@@ -358,4 +378,23 @@
         transform: rotateX(450deg) rotateZ(-720deg); 
     }
 }
+
+@keyframes bounce {
+    0% {
+        transform: scale(75);
+    }
+    25% {
+        transform: scale(100);
+    }
+    50% {
+        transform: scale(75);
+    }
+    75% {
+        transform: scale(50);
+    }
+    100% {
+        transform: scale(75);
+    }
+}
+
 </style>
