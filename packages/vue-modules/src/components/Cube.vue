@@ -2,6 +2,7 @@
     <div class="scene">
         <div class="cube">
             <div class="cube__face cube__face--inside">
+              
             </div>
             <div class="cube__face cube__face--front">
                 <slot name="game"></slot>
@@ -36,11 +37,12 @@
 </script>
 <style>
 .scene {
-  position: relative;
+  position: absolute;
+  left: 4%;
   perspective: 600px;
-  top: 10vh;
+  top: 20vh;
   animation: move 10s infinite ease-in-out;
-  scale: 80%;
+  scale: 75%;
 }
 
 .cube {
@@ -55,8 +57,8 @@
 
 .cube__face {
   position: absolute;
-  width: 446px;
-  height: 446px;
+  width: 430px;
+  height: 430px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -67,28 +69,28 @@
 } */
 
 .cube__face--inside{ transform: rotateY(  0deg) translateZ(  0px);}
-.cube__face--front { transform: rotateY(  0deg) translateZ(224px); }
-.cube__face--right { transform: rotateY( 90deg) translateZ(224px); }
-.cube__face--back  { transform: rotateY(180deg) translateZ(224px); }
-.cube__face--left  { transform: rotateY(-90deg) translateZ(224px); }
-.cube__face--top   { transform: rotateX( 90deg) translateZ(224px); }
-.cube__face--bottom{ transform: rotateX(-90deg) translateZ(224px); }
+.cube__face--front { transform: rotateY(  0deg) translateZ(216px); }
+.cube__face--right { transform: rotateY( 90deg) translateZ(216px); }
+.cube__face--back  { transform: rotateY(180deg) translateZ(216px); }
+.cube__face--left  { transform: rotateY(-90deg) translateZ(216px); }
+.cube__face--top   { transform: rotateX( 90deg) translateZ(216px); }
+.cube__face--bottom{ transform: rotateX(-90deg) translateZ(216px); }
 
 @keyframes float {
   0% {
-    transform: translateZ(-100px) rotateY(-10deg) rotateX(-5deg) rotateZ(0deg);
+    transform: translateZ(-100px) rotateY(0deg) rotateX(0deg) rotateZ(0deg);
   }
   30% {
-    transform: translateZ(-100px) rotateY(-8deg) rotateX(-12deg) rotateZ(0deg);
+    transform: translateZ(-100px) rotateY(-5deg) rotateX(-5deg) rotateZ(0deg);
   }
   50% {
-    transform: translateZ(-100px) rotateY(-5deg) rotateX(-10deg) rotateZ(0deg);
+    transform: translateZ(-100px) rotateY(0deg) rotateX(0deg) rotateZ(0deg);
   }
   66% {
-    transform: translateZ(-100px) rotateY(-8deg) rotateX(-8deg) rotateZ(0deg);
+    transform: translateZ(-100px) rotateY(5deg) rotateX(5deg) rotateZ(0deg);
   }
   100% {
-    transform: translateZ(-100px) rotateY(-10deg) rotateX(-5deg) rotateZ(0deg);
+    transform: translateZ(-100px) rotateY(0deg) rotateX(0deg) rotateZ(0deg);
   }
 }
 

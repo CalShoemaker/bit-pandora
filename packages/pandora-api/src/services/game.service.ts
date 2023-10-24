@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { type } from 'os';
 
 // TODO: Improve typings when adding other types
 type QuickGame = {
@@ -19,7 +18,10 @@ type GameStatus = {
 
 // Player type
 export type Player = {
+    pid: number,
     name?: string,
+    isTraditional?: boolean,
+    isFlat?: boolean,
     games?: {
         current?: number,
         history?: any,
@@ -39,10 +41,14 @@ export type GameState = {
 
 @Injectable()
 export class GameService {
-   private history;
+    private history;
+    private players;
+    private archive;
 
     constructor() {
         this.history = {};
+        this.archive = {};
+        this.players = {};
     }
     
     public getAll = () => this.history;
@@ -55,6 +61,9 @@ export class GameService {
 
     // Public game selector
     public getById = (id: number) => this.history[id];
+
+    // Public game selector
+    public getPlayerById = (id: number) => this.players[id];
     
     // Mutate game of id by payload. Mutations are private. 
     private updateById = (id:number, payload:object) => { 
@@ -94,7 +103,7 @@ export class GameService {
         status.active = history.length === 1 ? true : status.active;
 
         // BL: In context of a Cast, if history & no solution space - End
-        if(history.length > 0 && hasPlay.length === 0) {
+        if(history.length > 0 && hasPlay.length === 0 || score === 0) {
             // Zero out to prevent object link recurssion
             //game.players = [];
             player.games.current = 0;
@@ -163,14 +172,19 @@ export class GameService {
     // New Player
     public NewPlayer(config?: Player) {
         const pid = new Date().valueOf();
-        return {
+        const player = {
             name: config?.name,
-            pid,
+            pid: pid,
+            isFlat: config.isFlat,
+            isTraditional: config.isTraditional,
             games: {
                 current: null,
                 history: []
             }
         } as Player;
+
+        this.players[player.pid] = player;
+        return player;
     }
 
     // New Quick Game

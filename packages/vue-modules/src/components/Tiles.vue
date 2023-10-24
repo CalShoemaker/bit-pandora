@@ -14,12 +14,12 @@
 </template>
 <script lang="ts">
     import { mapGetters, mapActions } from 'vuex';
-    import { defineComponent, ref } from 'vue';
+    import { defineComponent, ref, reactive } from 'vue';
 
     export default defineComponent({
         props: ['id', 'player'],
         setup() {
-            const selected = ref([]);
+            const selected = reactive([]) as Array<number>;
             const range = ref([1,2,3,4,5,6,7,8,9])
             const lament = ref(false);
             return {
@@ -117,6 +117,7 @@
 .facet.enabled{
     pointer-events: all;
 }
+
  /* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
 .flip-card {
   background-color: transparent;
@@ -143,11 +144,21 @@
 }
 
 .flip-card.selected .flip-card-back{
-    background-color: #9aceeb;
-    color: black;
+    opacity: 0.8;
+    background-color: #d0e86e;
+    border: 1px solid #d0ec59;
+    color: #d0e86e;
 }
+.flip-card.taken .flip-card-inner{
+    transform: rotateY(180deg);
+}
+
 .flip-card.taken .flip-card-back { 
-    background-color: navy;
+    opacity: 0.9;
+    background-color: #0acb5e;
+    border: 1px solid #0acb5e;
+    color: #07110b;
+    box-shadow: 0 0 3px 3px #0acb5e;
 }
 
 /* Position the front and back side */
@@ -161,23 +172,27 @@
 
 /* Style the front side (fallback if image is missing) */
 .flip-card-front {
-  background-color: #bbb;
-  color: black;
+    background-color: #39c2c8;
+    border: 1px inset #55eaf7;
+    color: #55eaf7;
 }
 
 /* Style the back side */
 .flip-card-back {
-  background-color: dodgerblue;
-  color: white;
-  transform: rotateY(180deg);
+    background-color: #a7b564;
+    border: 1px solid #d0ec59;
+    color: #a7b564;
+    transform: rotateY(180deg);
 } 
+
+
 </style>
 <style lang="scss">
 .facet {
     .flip-card {
         background-color: transparent;
-        width: 148px;
-        height: 148px;
+        width: 143px;
+        height: 143px;
         perspective: 1000px; /* Remove this if you don't want the 3D effect */
         
         /* Do an horizontal flip when you move the mouse over the flip box container */
@@ -188,11 +203,7 @@
                 transform: rotateY(180deg);
             }
         }
-        &.taken {
-            .flip-card-back{
-                background-color: navy;
-            }
-        }
+
 
         &.lament {
             .flip-card-front {

@@ -56,23 +56,24 @@ module.exports = (_, argv) => ({
       exposes: {
         // "./store": "./src/store/index.ts" //
       },
-      shared: {
-        vue: {
-          eager: true,
-          singleton: true,
-          requiredVersion: deps.vue
-        },
-        "vue-router": {
-          eager: true,
-          singleton: true,
-          requiredVersion: deps["vue-router"]
-        },
-        vuex: {
-          eager: true,
-          singleton: true,
-          requiredVersion: deps["vuex"]
-        },
-      },
+      shared: require("./package.json").dependencies,
+      // shared: {
+      //   vue: {
+      //     eager: true,
+      //     singleton: true,
+      //     requiredVersion: deps.vue
+      //   },
+      //   "vue-router": {
+      //     eager: true,
+      //     singleton: true,
+      //     requiredVersion: deps["vue-router"]
+      //   },
+      //   vuex: {
+      //     eager: true,
+      //     singleton: true,
+      //     requiredVersion: deps["vuex"]
+      //   },
+      // },
     }),
     new HtmlWebPackPlugin({
       template: "./src/index.html",

@@ -1,5 +1,5 @@
 <template>
-    <div class="relative flex flex-auto dice-box" 
+    <div class="dice-box" 
         v-touch:swipe="handleSwipeUp"
         @pointerdown="pointerDown"
         @pointerup="pointerUp">
@@ -36,7 +36,7 @@
         const rolling = ref(false);
         const dice = reactive([1,6]);
         const proper = reactive(['one', 'two', 'three', 'four', 'five', 'six']);
-        const selected = reactive([]);
+        const selected = reactive([]) as Array<number>;
 
         const pointer = reactive({
             active:false,
@@ -125,7 +125,7 @@
 </script>
 <style>
 .container {
-    position: fixed;
+    position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
@@ -143,6 +143,12 @@
     transition: top 1s ease-in-out;
 }
 
+.dice-wrap:nth-child(2) {
+    left: 27%;
+}
+.dice-wrap.selected.waiting:nth-child(2) {
+    left: 25%;
+}
 .dice {
     pointer-events: none;
     position: absolute;
@@ -167,17 +173,25 @@
 }
 
 .dice-wrap.waiting {
-    position: absolute;
-    top: -65vh;
-    transition: top 1s ease-in-out;
+    position: relative;
+    top: -70vh;
+    transition: top 1.2s ease-in-out;
+}
+
+.dice-wrap.waiting:nth-child(1) {
+  animation: bounce 1.2s 1 ease-in-out, left 1.2s 1 ease-in-out;
+}
+
+.dice-wrap.waiting:nth-child(2) {
+  animation: bounce 1.2s 1 ease-in-out, right 1.2s 1 ease-in-out;
 }
 
 .dice-wrap.waiting .dice {
-    animation: rolling 1s 1 ease-in-out;
+    animation: rolling 750ms 1 ease-in-out;
 } 
 
 .dice-wrap.waiting .dice-two {
-    left: 120px;
+    animation-direction: alternate-reverse;
 } 
 
 .dot {
@@ -207,7 +221,7 @@
 
 .dice-wrap.selected .side .dot {
     background-color: #fff;
-  box-shadow: inset 2px 2px #f2f2f2;
+    box-shadow: inset 2px 2px #f2f2f2;
 }
   
 
@@ -379,21 +393,57 @@
     }
 }
 
-@keyframes bounce {
+@keyframes bounce{
     0% {
-        transform: scale(75);
+        transform: scale(75%);
     }
     25% {
-        transform: scale(100);
+        transform: scale(100%);
     }
     50% {
-        transform: scale(75);
+        transform: scale(150%);
     }
     75% {
-        transform: scale(50);
+        transform: scale(100%);
     }
     100% {
-        transform: scale(75);
+        transform: scale(75%);
+    }
+}
+
+@keyframes right {
+    0% {
+        left: 25%;
+    }
+    25% {
+        left:55%;
+    }
+    50% {
+        left:60%;
+    }
+    75% {
+        left:50%;
+    }
+    100% {
+        left:25%
+    }
+}
+
+@keyframes left {
+    0% {
+        left:25%;
+    }
+    25% {
+        left:5%;
+    }
+    50% {
+        left:20%;
+    }
+    75% {
+        left:35%;
+    }
+    100% {
+        left:25%
     }
 }
 

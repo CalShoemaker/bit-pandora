@@ -59,13 +59,22 @@ const pandoraActions = {
             context.commit("Update", data);
         });
     },
-    newPlayer(context:any, name: string){
-        const safeName = name.substring(0, 15);
+    newPlayer(context:any, config: any){
+        const safeName = config.name.substring(0, 15);
+        config.name = safeName;
+
         const PlayerOptions = {
             ...postOptions,
-            body: JSON.stringify({ name:safeName })
+            body: JSON.stringify(config)
         };
         return fetch(uri + 'player', PlayerOptions).then(res=>res.json());
+    },
+    getPlayer(context:any, id:number){
+        const GetPlayerOptions = {
+            ...getOptions
+        };
+
+        return fetch(uri + 'player/'+ id, GetPlayerOptions).then(res=>res.json());
     }
 }
 export default pandoraActions;

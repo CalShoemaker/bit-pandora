@@ -1,5 +1,5 @@
 <template>
-    <div class="flex">
+    <div class="player">
         <Dice :id="id" :player="player" />
     </div>
 </template>
@@ -23,3 +23,11 @@
         }
     })
 </script>
+<style>
+    .player {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+</style>

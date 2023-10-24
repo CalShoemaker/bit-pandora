@@ -1,20 +1,21 @@
 <template>
-    <div class="flex flex-col">
-        <Cube v-if="false">
+    <div class="flex flex-col min-h-screen">
+        <Tiles v-if="player.isTraditional || player.isFlat" :player="player" :id="id" class="tiles" />
+        <Cube v-else>
             <template v-slot:game>
                 <Tiles :player="player" :id="id" />
             </template>
         </Cube>
-        <Tiles v-else :player="player" :id="id" class="tiles" />
-        <div class="text-white">
-            <template v-if="status && status.win || status && status.lose">
+
+        <template v-if="status && status.win || status && status.lose">
+            <div class="text-white">
                 <h2>Game Over {{ player.name || "booo" }}, You {{ status.win ? "WIN" : "LOSE" }}!</h2>
                 <ul>
                     <li>Score: {{ status.score }}</li>
                 </ul>
                 <button v-on:click="newGame()">New Quick Game</button>
-            </template>
-        </div>
+            </div>
+        </template>
         <Player :id="id" :player="player" />
     </div>
 </template>
@@ -62,6 +63,7 @@
                 'status'
             ]),
             player() {
+                console.log(this.players)
                 return this.players[0] || {
                     name: 'boo',
                     games: {
