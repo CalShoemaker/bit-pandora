@@ -1,5 +1,5 @@
 <template>
-    <div class="player">
+    <div class="player flex flex-row">
         <Dice :id="id" :player="player" />
     </div>
 </template>
@@ -24,10 +24,8 @@
     })
 </script>
 <style>
-    .player {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
+    .player {   
+        background:linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)); 
+
     }
 </style>

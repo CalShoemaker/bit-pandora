@@ -3,7 +3,7 @@ import pandoraGetters from './getters';
 import pandoraActions from './actions';
 
 // Game Status shape
-interface GameStatus {
+export type GameStatus = {
     finish?: string,
     win: boolean,
     active: boolean,
@@ -13,9 +13,12 @@ interface GameStatus {
 
 // Player type
 export type Player = {
+    pid: number,
     name?: string,
+    isTraditional?: boolean,
+    isFlat?: boolean,
     games?: {
-        current?: any,
+        current?: number,
         history?: any,
     }
 }
@@ -25,10 +28,11 @@ export type GameState = {
     id: number,
     type: string,
     status: GameStatus,
-    canPlay?: Array<Set<number>>,
-    players?: Array<Player>,
-    history?: Array<Array<number>>,
+    canPlay?: Array<Array<number>> | [],
+    players: Array<Player> | [],
+    history: Array<Array<number>> | [],
     tiles: Array<number>,
+    channel?:any
 }
 
 // Default game

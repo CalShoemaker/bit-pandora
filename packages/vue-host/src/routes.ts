@@ -14,6 +14,10 @@ const routes = [{
     path: "/newgame",
     component: NewGame,
 },{
+    path: "/game/:id/",
+    component: Game,
+    props: true
+},{
     path: "/game/:id/:pid",
     component: Game,
     props: true

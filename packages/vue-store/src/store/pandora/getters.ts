@@ -6,9 +6,11 @@ const pandoraGetters = {
     type: (state:GameState) => state.type,
     gid: (state:GameState) => state.id,
     players: (state:GameState) => state.players,
+    playerById: (state:GameState) => (pid:number) => state.players.filter(player => player.pid === pid)[0],
     history: (state:GameState) => state.history,
     tiles: (state:GameState) => state.tiles,
-    status: (state:GameState) => state.status
+    status: (state:GameState) => state.status,
+    channel: (state:GameState) => state.channel
 }
 
 export default pandoraGetters;

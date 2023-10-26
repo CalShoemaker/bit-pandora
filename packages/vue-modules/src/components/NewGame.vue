@@ -3,15 +3,19 @@
         <div class="relative flex flex-col p-5">
             <div>
                 <label>Player Name</label>
-                <input v-model="name" placeholder="Player Name" />
+                <input v-model="state.name" placeholder="Player Name" />
             </div>
             <div>
-                <input type="checkbox" v-model="isFlat" />
+                <input type="checkbox" v-model="state.isFlat" />
                 <label for="isFlat">3D Active</label>
             </div>
             <div>
-                <input type="checkbox" v-model="isTraditional" />
+                <input type="checkbox" v-model="state.isTraditional" />
                 <label for="isTraditional">Traditional</label>
+            </div>
+            <div>
+                <label>Players</label>
+                <input v-model="state.players" placeholder="Player Name" maxlength="1" max="2" />
             </div>
             <div>
                 <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" v-on:click="newQuickGame()">New Quick Game</button>
@@ -21,17 +25,25 @@
 </template>
 <script lang="ts">
     import { mapGetters, mapActions } from 'vuex';
-    import { defineComponent, ref } from 'vue';
+    import { defineComponent, ref, reactive } from 'vue';
 
     export default defineComponent({
         setup(){
+            
             const name = ref('');
             const isFlat = ref(false);   
-            const isTraditional = ref(true);  
+            const isTraditional = ref(true); 
+            const players = ref(1);
+
+            const state = reactive({
+                name: name,
+                isFlat: isFlat,
+                isTraditional: isTraditional,
+                players: players
+            });
+
             return {
-                name,
-                isFlat,
-                isTraditional
+                state
             } 
         },
         methods: {
@@ -41,9 +53,9 @@
                 'newPlayer'
             ]),
             newQuickGame(){
-                if(this.name.length > 2){
-                    this.newPlayer({name: this.name, isTraditional:this.isTraditional, isFlat:this.isFlat }).then(UserPlayer => {
-                        this.init({ player:UserPlayer, type:"QUICK" }).then(game=>{
+                if(this.state.name.length > 2){
+                    this.newPlayer({name: this.state.name, isTraditional:this.state.isTraditional, isFlat:this.state.isFlat }).then(UserPlayer => {
+                        this.init({ player:UserPlayer, type:"QUICK", players: this.state.players }).then(game=>{
                             this.$emit('doLink', 'game/' + game.id + '/' + UserPlayer.pid);
                         })
                     });

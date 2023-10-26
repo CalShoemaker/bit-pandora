@@ -1,3 +1,5 @@
+import { GameState } from ".";
+
 const uri = "http://localhost:8081/api/";
 
 const postOptions = {
@@ -29,10 +31,33 @@ const pandoraActions = {
         const GetGameOptions = {
             ...getOptions
         };
-
-        //const channel = new EventSource(uri + id + '/channel');
             
-        return fetch(uri + id, GetGameOptions).then(res=>res.json()).then(data=>{
+        return fetch(uri + id, GetGameOptions).then(res=>res.json()).then(data=>{        
+            data.channel = new EventSource(uri + id + '/channel');
+            context.commit("Update", data);
+            return data;
+        });
+    },
+    getGame(context:any, id:number){
+        const GetGameOptions = {
+            ...getOptions
+        };
+            
+        return fetch(uri + id, GetGameOptions).then(res=>res.json()).then(data=>{        
+            context.commit("Update", data);
+            return data;
+        });
+    },
+    join(context:any, config:any) {
+        // Ensure config data
+        // config = (config.name && config.type || config.player && config.type) ? config : { name: "Player One", type:"QUICK" } ;
+
+        const GameOptions = {
+            ...postOptions,
+            body: JSON.stringify(config)
+        };
+
+        return fetch(uri + config.gid +"/join", GameOptions).then(response => response.json()).then(data=>{
             context.commit("Update", data);
             return data;
         });
@@ -75,6 +100,12 @@ const pandoraActions = {
         };
 
         return fetch(uri + 'player/'+ id, GetPlayerOptions).then(res=>res.json());
+    },
+    chirp(context:any, raw:string){
+        let _raw:GameState = JSON.parse(JSON.stringify(raw));
+        if(_raw){
+            return context.commit("Merge", _raw);
+        }
     }
 }
 export default pandoraActions;

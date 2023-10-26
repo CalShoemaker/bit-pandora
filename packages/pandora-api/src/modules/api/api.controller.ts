@@ -44,6 +44,12 @@ export class ApiController {
   async findOnePlayer(@Param('id') id): Promise<any> {
     return this.gameService.getPlayerById(id);
   }
+  @Post('/:id/join')
+  join(@Body() config) {
+    const game = this.gameService.JoinGame(config);
+    this.eventsService.emit(game);
+    return game;
+  }
 
   @Get('/:id')
   async findOneGame(@Param('id') id): Promise<any> {

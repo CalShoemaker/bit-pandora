@@ -1,24 +1,24 @@
 <template>
-    <div class="dice-box" 
+    <div class="dice-box relative flex-none" 
         v-touch:swipe="handleSwipeUp"
         @pointerdown="pointerDown"
         @pointerup="pointerUp">
 
         <div class="dice-wrap"
-            v-for="(die, d) in dice"
+            v-for="(die, d) in state.dice"
             v-touch:swipe="handleSwipeUp"  
             v-touch="handleTap(d)" 
             :class="{ 
                 selected: inSelected(d), 
-                rolling: rolling && inSelected(d),
-                waiting: canPlay.length > 0 && inSelected(d)
+                rolling: state.rolling && inSelected(d),
+                waiting: _canPlay.length > 0 && inSelected(d)
             }">
 
             <div class="dice" 
                 v-bind:key="d" 
-                :class="['dice-' + proper[d], showDie(d, die)]">
-                <div v-for="(side, si) in 6" class='side' :class="[proper[side-1]]" v-bind:key="si" >
-                    <div v-for="(dot, i) in side" class="dot" :class="[proper[side-1] + '-' + dot]" v-bind:key="i"></div>
+                :class="['dice-' + state.proper[d], showDie(d, die)]">
+                <div v-for="(side, si) in 6" class='side' :class="[state.proper[side-1]]" v-bind:key="si" >
+                    <div v-for="(dot, i) in side" class="dot" :class="[state.proper[side-1] + '-' + dot]" v-bind:key="i"></div>
                 </div>
             </div> 
         </div>
@@ -34,9 +34,9 @@
     props: ['id','player'],
     setup() {
         const rolling = ref(false);
-        const dice = reactive([1,6]);
+        const dice = ref([1,6]);
         const proper = reactive(['one', 'two', 'three', 'four', 'five', 'six']);
-        const selected = reactive([]) as Array<number>;
+        const selected = reactive([0,1]) as Array<number>;
 
         const pointer = reactive({
             active:false,
@@ -47,21 +47,32 @@
             startPosY:0
         });
 
+        const state = reactive({
+          rolling,
+          dice,
+          selected, 
+          proper,
+          pointer
+        });
+
         return {
-            proper,
-            rolling,
-            dice,
-            pointer,
-            selected
+            state
         }
     },
     computed: {
         ...mapGetters('pandoraModule', [
             'history',
-            'canPlay'
+            'canPlay',
+            'status'
         ]),
+        _history(){
+          return this.status.players > 1 ? this.player.games.current.history : this.history;
+        },
+        _canPlay(){
+          return this.status.players > 1 ? this.player.games.current.canPlay : this.canPlay;
+        },
         range() {
-            const h = this.history; // History
+            const h = this._history; // History
             const l = h.length -1; // Last
             const p = h[l]; // Playable
             return p ?? [];
@@ -72,43 +83,45 @@
             'Cast'
         ]),
         showDie(i:number, d:number){
-            return this.selected.includes(i) ? 'show-' + this.range[i] : "";
+            return this.state.selected.includes(i) ? 'show-' + this.range[i] : "";
         },
         inSelected(i:number){
-            return this.selected.includes(i);
+            return this.state.selected.includes(i);
         },
         rollDice(player:any, id:number, d:number) {
             if(this.player && this.id) this.Cast({player, id, d});
         },
         pointerDown(e:Event) {
-            this.pointer.active = true;
-            this.rolling = true;
-            this.pointer.last = new Date().valueOf();
+          
+            this.state.pointer.active = true;
+            this.state.rolling = true;
+            this.state.pointer.last = new Date().valueOf();
+            console.log(this.state)
             setTimeout(() => {
-                if(this.rolling){
+                if(this.state.rolling){
                     this.pointerUp();
                 }
-            }, 5000);
+            }, 3000);
         },
         pointerUp() {
-            this.rolling = false;
+            this.state.rolling = false;
             const pointer = new Date().valueOf();
 
-            if(pointer > this.pointer.last + 1000){
-                this.pointer.last = pointer;
-                this.rollDice(this.player, this.id, this.selected.length);
+            if(pointer > this.state.pointer.last + 1000){
+                this.state.pointer.last = pointer;
+                this.rollDice(this.player, this.id, this.state.selected.length);
             }
 
-            this.pointer.active = false;
+            this.state.pointer.active = false;
         },
         handleTap(id:number){
-            if(this.canPlay.length > 0) return;
+            if(this._canPlay.length > 0) return;
             const handler = (direction:any, mouseEvent:Event) =>{
-                if(this.selected.includes(id)){
-                    const filtered = this.selected.filter(sid => sid !== id);
-                    this.selected = filtered;
+                if(this.state.selected.includes(id)){
+                    const filtered = this.state.selected.filter(sid => sid !== id);
+                    this.state.selected = filtered;
                 } else {
-                    this.selected.push(id);
+                    this.state.selected.push(id);
                 }
             }
 
@@ -116,49 +129,58 @@
         },
         handleSwipeUp(){
             if(this.player && this.id){
-                this.rolling = false;
-                this.rollDice(this.player, this.id, this.selected.length);
+                this.state.rolling = false;
+                this.rollDice(this.player, this.id, this.state.selected.length);
             } 
         }
     }
   });
 </script>
 <style>
-.container {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding-top:70px;
-}
+  .dice-box {
+    max-height: 90px;
+    margin: 0 auto;
+    border: 1px dashed #900b04;
+  }
 
-.dice-wrap {
-    scale: 75%;
-    position: relative;
-    display: inline-block;
-    min-width: 100px;
-    min-height: 100px;
-    left: 25%;
-    top: 0;
-    transition: top 1s ease-in-out;
-}
-
-.dice-wrap:nth-child(2) {
-    left: 27%;
-}
-.dice-wrap.selected.waiting:nth-child(2) {
-    left: 25%;
-}
-.dice {
+  .inlay-text {
     pointer-events: none;
+    color: rgba(0,0,0,0.3);
+    text-shadow: -1px -1px rgba(0,0,0,0.5);
+    font-weight: bold;
+    text-transform: uppercase;
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100px;
-    height: 100px;
-    transform-style: preserve-3d;
-    transition: transform 1s; 
-}
+    top: 25%;
+  }
+
+  .dice-wrap {
+      scale: 70%;
+      position: relative;
+      display: inline-block;
+      min-width: 100px;
+      min-height: 100px;
+      top: -5px;
+      transition: top 1s ease-in-out;
+  }
+
+  .dice-wrap.selected {
+    pointer-events: none;
+  }
+
+  .dice-wrap.selected.waiting:nth-child(2) {
+      left: 25%;
+  }
+
+    .dice {
+        pointer-events: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 100px;
+        transform-style: preserve-3d;
+        transition: transform 1s; 
+    }
 
 .dice-wrap.rolling .dice-one{
     animation: rolling 3s infinite ease-in-out;
@@ -173,10 +195,12 @@
 }
 
 .dice-wrap.waiting {
+  pointer-events: all;
     position: relative;
     top: -70vh;
     transition: top 1.2s ease-in-out;
 }
+
 
 .dice-wrap.waiting:nth-child(1) {
   animation: bounce 1.2s 1 ease-in-out, left 1.2s 1 ease-in-out;
@@ -187,6 +211,7 @@
 }
 
 .dice-wrap.waiting .dice {
+
     animation: rolling 750ms 1 ease-in-out;
 } 
 
@@ -225,6 +250,17 @@
 }
   
 
+
+.dice-wrap.selected .side{
+    background-color:rgba(227, 218, 201, 1);
+    border: 1px solid rgb(149, 139, 121);
+    box-shadow: 1px 1px 10px 5px #aa9983 inset; 
+}
+
+.dice-wrap.selected .side .dot {
+    background-color: #ef233c;
+    box-shadow: inset 2px 2px rgba(0,0,0,0.2);
+}
 .side:nth-child(1) {
   transform: translateZ(3.1em); }
 
@@ -273,17 +309,7 @@
 }
 </style>
 <style lang="scss" noscript>
-.dice-wrap {
-  position: relative;
-  display: inline-block;
-  min-width: 100px;
-  min-height: 100px;
-  &.selected {
-    .side{
-        
-    }
-  }
-}
+
 
 .dice {
     position: absolute;;
