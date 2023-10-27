@@ -1,12 +1,27 @@
 <template>
     <!-- NOTE: Wrap Game in Player as a game requires a player to render. -->
-    <div class="flex flex-col bp-game" :class="{ traditional: player.isTraditional || true }" :key="gameKey">
-        <div class="flex-none h-20">
-            {{  status.active }} | {{  gameKey }}
+    <div class="flex flex-col bp-game" :v-if="player && pid" :class="{ traditional: player && player.isTraditional || true }" :key="gameKey">
+        <div class="flex flex-row h-20">
+            <div class="flex flex-grow" :v-if="player">
+                {{  player.name }} 
+            </div>
+            <div class="flex flex-grow" :v-if="opponent">
+                {{  opponent.name }}
+            </div>
+            <div class="flex flex-none">
+                {{  status.active }}
+            </div>
         </div>
 
-        <div class="flex-auto bp-game--board" v-if="pid">
-            <Tiles v-if="player.isTraditional || player.isFlat" :player="player" :id="id" class="tiles" />
+        <div class="flex-auto bp-game--board" v-if="player && pid">
+            <Tiles  :player="player" 
+                    :pid="pid" 
+                    :id="id" 
+                    :opponent="opponent" 
+                    :history="history" 
+                    :canPlay="canPlay"
+                    :tiles="tiles"
+                    class="tiles" />
             <Cube v-if="false">
                 <template v-slot:game>
                     <Tiles :player="player" :id="id" />
@@ -14,7 +29,7 @@
             </Cube>
         </div>
         <div class="flex-none">
-            <Player v-if="pid" :id="id" :player="player" />
+            <Player v-if="player && pid" :id="id" :player="player" :history="history" :canPlay="canPlay" />
         </div>
         <template v-if="status && status.win || status && status.lose">
             <div class="text-white">
@@ -46,116 +61,83 @@
     export default defineComponent({
         props: ['id', 'pid'],
 
-        setup(props) {
-            
-            // TODO: Map local state to store
-            const guest = reactive({
-                name: '',
-                active: !props.pid
-            });
-            
-            const scene = ref(null);
-            const range = reactive([1,2,3,4,5,6,7,8,9]);
-            const selected = reactive([]);
-
-            // NOTE: Leverage Vue3 
-            // const player = reactive({
-            //     name: "Clu",
-            //     isFlat: false,
-            //     isTraditional: false,
-            //     games: {
-            //         current: undefined,
-            //         history: []
-            //     }
-            // }) as PlayerType;
-            
-            return { scene, range, selected, guest};
+        data(){
+            return {
+                gameKey: 0,
+                guest: {
+                    name: '',
+                    active: !this.pid
+                }
+            }
         },
         created() {
             // TODO: Hoist this condition into Setup.
             if(this.id && this.pid) {
                 this.guest.active = false;
-                if(this.channel){
-                    this.channel.onmessage = (e:any)=>{
 
-                        const dat = JSON.parse(e.data);
-                        this.chirp(dat);
-                        this.forceRerender();
-                        
-                        console.log("chirped from channel", dat)
+                this.setup(this.id).then(data => {
+                    data.channel.onmessage = (e:any)=>{
+                        //const dat = JSON.parse(e.data);
+                        this.getGame(this.gid);
                     }
-                } else {
-                    this.setup(this.id).then(data => {
-                        this.chirp(data);
-                        data.channel.onmessage = (e:any)=>{
-                            const dat = JSON.parse(e.data);
-                            this.chirp(dat);
-                            this.forceRerender();
-                            console.log("chirped from setup",dat);
-
-                            this.getGame(this.gid);
-                        }
-                    })
-                }
-            }
-        },
-        data() {
-            return {
-                gameKey: 0,
-            };
-        },
-        mounted(){
-
-            console.log(this.channel)
-            if(this.guest.active){
-                console.log(this.$data)
-            }
-            if(this.channel){
-                console.log(this.channel)
-                this.channel.onmessage = (e:any)=>{
-                    if(this.status.active){
-                        this.chirp(e.data);
-                    }
-                    this.forceRerender();
-                }
+                })
             }
         },
         watch: {
-            // Watches the gameid and navigates to new game
-            // NOTE: this is some kind of wrap for router push. Refactor.
+
             gid(newID, oldID) {
                 if(!this.id || newID !== oldID) {
                    this.gotoGame(newID);
                 }
             }
         },
-        beforeDestroy(){
-            
-        },
         computed: {
             ...mapGetters('pandoraModule', [
                 'gid',
-                'tiles', 
-                'total', 
-                'history',
+                'canPlayById',
+                'tilesById', 
+                'historyById',
                 'playerById',
+                'opponentById',
                 'players',
-                'canPlay',
                 'status',
-                'channel'
+                'channel',
+                'pKeys'
             ]),
-            player(){
-                // NOTE: This shouldn't be computed or abstracted from the array.
-                // TODO: Either use filter by pid on players array, or even better:
-                //       Player should be passed as a prop after grabbed from store.
-                return this.players[this.pid] || {
-                    name: 'boo',
-                    games: {
-                        history: []
+            history(){
+                return JSON.parse(JSON.stringify(this.historyById(this.pid))) || []
+            },
+            tiles(){
+                return JSON.parse(JSON.stringify(this.tilesById(this.pid))) || []
+            },
+            canPlay(){
+                return JSON.parse(JSON.stringify(this.canPlayById(this.pid))) || []
+            },
+            opponent(){
+                if(this.pKeys.length > 1)
+                {
+                    const o = this.pKeys.find((k:string) => k !== this.pid)
+                    return this.players[o];
+                } else {
+                    return {
+                        name: 'boo',
+                        games: {
+                            history: []
+                        }
                     }
-                };
-                // TODO: I even wrote the playerById function... use it. 
-                //return this.playerById(this.pid) as PlayerType;
+                }
+            },
+            player(){
+                if(this.pKeys.length > 0 && this.pid && this.players[this.pid]){
+                    return this.players[this.pid];
+                } else {
+                    return {
+                        name: 'boo',
+                        games: {
+                            history: []
+                        }
+                    }
+                }
             }
         },
         methods: {
@@ -169,11 +151,6 @@
             ]),
             forceRerender() {
                 this.gameKey += 1;
-            },
-            fullScreen(){
-                if(this.scene){
-                    // NOTE: Full screen magic that doesn't work on iOS. Thanks Safari.
-                }
             },
             joinGame(){
                 this.newPlayer({name: this.guest.name, isTraditional:this.status.isTraditional, isFlat:this.status.isFlat }).then(GuestPlayer => {
@@ -211,6 +188,7 @@
 
 .bp-game {
     height: calc(100vh - 80px);
+    width: auto;
 }
 .traditional {
     background: #a20c05;

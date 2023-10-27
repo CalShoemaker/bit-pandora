@@ -11,6 +11,15 @@ export type GameStatus = {
     score: number
 }
 
+// Game Slice
+export type GameSlice = {
+    id?: number,
+    pid: number,
+    tiles: Array<number>,
+    history: Array<Array<number>>,
+    canPlay: Array<Array<number>>
+}
+
 // Player type
 export type Player = {
     pid: number,
@@ -18,7 +27,7 @@ export type Player = {
     isTraditional?: boolean,
     isFlat?: boolean,
     games?: {
-        current?: number,
+        current?: GameSlice,
         history?: any,
     }
 }

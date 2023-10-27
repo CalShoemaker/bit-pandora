@@ -1,6 +1,6 @@
 <template>
     <div class="player flex flex-row">
-        <Dice :id="id" :player="player" />
+        <Dice :id="id" :player="player" :canPlay="canPlay" :history="history" />
     </div>
 </template>
 <script lang="ts">
@@ -9,12 +9,10 @@
     import Dice from './Dice.vue';
 
     export default defineComponent({
-        props:['id', 'player'],
+        props:['id', 'player', 'canPlay', 'history'],
         computed: {
             ...mapGetters('pandoraModule', [
-                'history',
                 'players',
-                'canPlay',
                 'status'
             ])
         },

@@ -1,15 +1,15 @@
 <template>
-    <div class="grid grid-cols-3 facet" :class="{ enabled: _canPlay.length > 0 }">
+    <div class="grid grid-cols-3 facet" :class="{ enabled: canPlay.length > 0 }">
         <div v-for="(number, index) in range" 
              v-bind:key="index" 
              class="flip-card" 
              :class="{ 
                 given: given.includes(number),
                 selected: selected.includes(number), 
-                taken:!_tiles.includes(number),
-                closed: !opponent.games.current.tiles.includes(number)
+                taken:!tiles.includes(number),
+                closed: opponent && opponent.games.current && !opponent.games.current.tiles.includes(number)
             }" >
-            <div class="flip-card-inner flex items-center justify-center" v-touch:longtap="give(number)" v-touch="select(number)">
+            <div class="flip-card-inner flex items-center justify-center" v-touch:longtap="click('give', number)" v-touch="click('take', number)">
                 <div class="flip-card-front flex items-center justify-center">
                     <span class="tile">{{ number }}</span>
                 </div>
@@ -24,8 +24,16 @@
     import { mapGetters, mapActions } from 'vuex';
     import { defineComponent, ref, reactive, toRaw } from 'vue';
 
+    type Conditions = {
+        h: Array<Array<number>>, 
+        s: Array<number>, 
+        g: Array<number>, 
+        c: Array<number>, 
+        n: number
+    }
+
     export default defineComponent({
-        props: ['id', 'player'],
+        props: ['id', 'pid', 'player', 'opponent', 'history', 'canPlay', 'tiles'],
 
         data(){
             return {
@@ -36,72 +44,18 @@
         },
         computed: {
             ...mapGetters('pandoraModule', [
-                'tiles', 
-                'total', 
-                'history',
                 'players',
-                'canPlay',
                 'status'
             ]),
 
-            // TODO: Move these wrappers to somewhere else. Maybe pass from parent.
-            // NOTE: As a matter of fact... 'Tiles' really shouldn't know or do all of this.
-            _history(){
-                return this.status.players > 1 ? this.player.games.current.history : this.history;
-            },
-            _canPlay(){
-                return this.status.players > 1 ? this.player.games.current.canPlay : this.canPlay;
-            },
-            _tiles(){
-                return this.status.players > 1 ? this.player.games.current.tiles : this.tiles;
-            },
-            opponent(){
-                const ps = JSON.parse(JSON.stringify(this.players));
-                const psKeys = Object.keys(ps);
-                const player = JSON.parse(JSON.stringify(this.player));
-                const playerI = psKeys.indexOf(player.pid);
-                psKeys.splice(playerI);
-                const opponentI = psKeys.pop() || "";
-                return ps[opponentI];
-            }
+        },
+        mounted(){
+            console.log(this.history, this.canPlay, this.tiles)
         },
         methods: {
             ...mapActions('pandoraModule', [
                 'Pick'
             ]),
-
-            give(n: number){
-                const handler = (direction:any, mouseEvent:Event) => {
-                    
-                    const given = this.given;
-                    const canPlay = this._canPlay;
-                    const selected = this.selected;
-                    const history = this._history;
-                    
-                    this.pushOrPop(given, selected, n);
-
-                    if(this.canPick(history, selected, given, canPlay, n)){
-                        this.pick();
-                    }
-                }
-
-                return handler;
-            },
-            canPick(h:Array<Array<number>>, s:Array<number>, g:Array<number>, c:Array<number>, n:number){
-                const sum = (a:Array<number>, s:number) => a.reduce((p:number, a:number) => p + a, s);
-                const l = h[h.length - 1] as Array<number>;
-                const gSum = sum(g, 0);
-                const nSum = sum(s, 0);
-                const dSum = sum(l, 0);
-                const flatCanPlay = c.flat();
-                const inFlatCanPlay = flatCanPlay.includes(n);
-                const maxCanPlay = Math.max(...flatCanPlay, dSum);
-
-                if(nSum > maxCanPlay) { this.selected = []; }
-                if(gSum > maxCanPlay) { this.given = []; }
-                
-                return nSum === maxCanPlay && inFlatCanPlay || gSum === maxCanPlay || gSum + nSum === maxCanPlay;
-            },
             pushOrPop(t:Array<number>, f:Array<number>, n: number){
                 if(!t.includes(n) && !f.includes(n)) {
                     t.push(n);
@@ -110,26 +64,41 @@
                     t.splice(i);
                 }
             },
-            select(n: number){
-                const handler = (direction:any, mouseEvent:Event) => {
-                    // Reject on no play
-                    const canPlay = this._canPlay;
-                    if(canPlay.length === 0) return;
-                    
-                    // Push or splice
-                    const selected = this.selected;
-                    const given = this.given;
-                    const history = this._history;
-                    
-                    this.pushOrPop(selected, given, n);
+            click(a:string, n:number) {
+                const handler = (direction:any, mouseEvent:Event) => {      
+                    const h = this.history;
+                    const s = this.selected;
+                    const g = this.given; 
+                    const c = this.canPlay;
+                    if(c.length === 0) return false;
 
-                    if(this.canPick(history, selected, given, canPlay, n)){
-                        this.pick();
-                    }
+                    a === "take" ? this.pushOrPop(s, g, n) : this.pushOrPop(g, s, n);
+                    return this.canPick({h, s, g, c, n}) ? this.pick() : null;
                 }
-
-                return handler;
+                return handler
             },
+            canPick(conditions:Conditions) {
+                const { h, s, g, c, n} = conditions;
+                const sum = (a:Array<number>, s:number) => a.reduce((p:number, a:number) => p + a, s);
+
+                const state = {
+                    sums: {
+                        g: sum(g, 0),
+                        s: sum(s, 0),
+                        l: sum(h[h.length - 1], 0)
+                    },
+                    flats: {
+                        c: c.flat() as Array<number>
+                    },
+                    max: function (){ return Math.max(...this.flats.c, this.sums.l) }
+                }
+               
+                if(state.sums.s > state.max()) { this.selected = []; }
+                if(state.sums.g > state.max()) { this.given = []; }
+                
+                return state.sums.s === state.max() && state.flats.c.includes(n) || state.sums.g === state.max() || state.sums.g + state.sums.s === state.max();
+            },
+            
             pick() {
                 this.Pick({
                     player: this.player, 
@@ -139,7 +108,9 @@
                         take: this.selected 
                     }
                 });
-                return this.selected = [];
+
+                this.selected = [];
+                this.given = [];
             }
         }
     })
@@ -222,7 +193,6 @@
     border: 1px dashed rgb(255, 0, 0) inset,
 }
 
-.flip-card.closed .flip-card-inner .tile,
 .flip-card.taken .flip-card-inner .tile{
     display: none;
 }

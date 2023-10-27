@@ -1,24 +1,25 @@
 <template>
-    <div class="dice-box relative flex-none" 
+    <div class="dice-box relative flex-none"
+        v-if="player" 
         v-touch:swipe="handleSwipeUp"
         @pointerdown="pointerDown"
         @pointerup="pointerUp">
 
         <div class="dice-wrap"
-            v-for="(die, d) in state.dice"
+            v-for="(die, d) in dice"
             v-touch:swipe="handleSwipeUp"  
             v-touch="handleTap(d)" 
             :class="{ 
                 selected: inSelected(d), 
-                rolling: state.rolling && inSelected(d),
-                waiting: _canPlay.length > 0 && inSelected(d)
+                rolling: rolling && inSelected(d),
+                waiting: canPlay && canPlay.length > 0 && inSelected(d)
             }">
 
             <div class="dice" 
                 v-bind:key="d" 
-                :class="['dice-' + state.proper[d], showDie(d, die)]">
-                <div v-for="(side, si) in 6" class='side' :class="[state.proper[side-1]]" v-bind:key="si" >
-                    <div v-for="(dot, i) in side" class="dot" :class="[state.proper[side-1] + '-' + dot]" v-bind:key="i"></div>
+                :class="['dice-' + proper[d], showDie(d, die)]">
+                <div v-for="(side, si) in 6" class='side' :class="[proper[side-1]]" v-bind:key="si" >
+                    <div v-for="(dot, i) in side" class="dot" :class="[proper[side-1] + '-' + dot]" v-bind:key="i"></div>
                 </div>
             </div> 
         </div>
@@ -31,50 +32,31 @@
     
 
     export default defineComponent({
-    props: ['id','player'],
-    setup() {
-        const rolling = ref(false);
-        const dice = ref([1,6]);
-        const proper = reactive(['one', 'two', 'three', 'four', 'five', 'six']);
-        const selected = reactive([0,1]) as Array<number>;
-
-        const pointer = reactive({
+    props: ['id', 'pid', 'player', 'canPlay', 'history'],
+    data(){
+      return {
+        rolling: false,
+        dice: [1,6],
+        proper: ['one', 'two', 'three', 'four', 'five', 'six'],
+        selected: [0,1],
+        pointer: {
             active:false,
             last:0,
             newPosX:0, 
             newPosY:0, 
             startPosX:0, 
             startPosY:0
-        });
-
-        const state = reactive({
-          rolling,
-          dice,
-          selected, 
-          proper,
-          pointer
-        });
-
-        return {
-            state
         }
+      }
     },
     computed: {
         ...mapGetters('pandoraModule', [
-            'history',
-            'canPlay',
             'status'
         ]),
-        _history(){
-          return this.status.players > 1 ? this.player.games.current.history : this.history;
-        },
-        _canPlay(){
-          return this.status.players > 1 ? this.player.games.current.canPlay : this.canPlay;
-        },
         range() {
-            const h = this._history; // History
-            const l = h.length -1; // Last
-            const p = h[l]; // Playable
+            const h = this.history; // History
+            const l = h ? h.length -1 : 0; // Last
+            const p = h ? h[l]: []; // Playable
             return p ?? [];
         }
     },
@@ -83,45 +65,47 @@
             'Cast'
         ]),
         showDie(i:number, d:number){
-            return this.state.selected.includes(i) ? 'show-' + this.range[i] : "";
+            return this.selected.includes(i) ? 'show-' + this.range[i] : "";
         },
         inSelected(i:number){
-            return this.state.selected.includes(i);
+            return this.selected.includes(i);
         },
         rollDice(player:any, id:number, d:number) {
             if(this.player && this.id) this.Cast({player, id, d});
         },
         pointerDown(e:Event) {
           
-            this.state.pointer.active = true;
-            this.state.rolling = true;
-            this.state.pointer.last = new Date().valueOf();
-            console.log(this.state)
+            console.log(this.history, this.canPlay);
+
+            this.pointer.active = true;
+            this.rolling = true;
+            this.pointer.last = new Date().valueOf();
             setTimeout(() => {
-                if(this.state.rolling){
-                    this.pointerUp();
+                if(this.rolling){
+                    this.pointerUp(null);
                 }
             }, 3000);
         },
-        pointerUp() {
-            this.state.rolling = false;
-            const pointer = new Date().valueOf();
+        pointerUp(e:Event | null) {
+              this.rolling = false;
+              const pointer = new Date().valueOf();
 
-            if(pointer > this.state.pointer.last + 1000){
-                this.state.pointer.last = pointer;
-                this.rollDice(this.player, this.id, this.state.selected.length);
-            }
-
-            this.state.pointer.active = false;
+              if(pointer > this.pointer.last + 1000){
+                  this.pointer.last = pointer;
+                  this.rollDice(this.player, this.id, this.selected.length);
+              }
+              console.log(this.history, this.canPlay)
+              this.pointer.active = false;
+  
         },
         handleTap(id:number){
-            if(this._canPlay.length > 0) return;
             const handler = (direction:any, mouseEvent:Event) =>{
-                if(this.state.selected.includes(id)){
-                    const filtered = this.state.selected.filter(sid => sid !== id);
-                    this.state.selected = filtered;
+                if(this.canPlay.length > 0) return;
+                if(this.selected.includes(id)){
+                    const filtered = this.selected.filter(sid => sid !== id);
+                    this.selected = filtered;
                 } else {
-                    this.state.selected.push(id);
+                    this.selected.push(id);
                 }
             }
 
@@ -129,8 +113,8 @@
         },
         handleSwipeUp(){
             if(this.player && this.id){
-                this.state.rolling = false;
-                this.rollDice(this.player, this.id, this.state.selected.length);
+                this.rolling = false;
+                this.rollDice(this.player, this.id, this.selected.length);
             } 
         }
     }

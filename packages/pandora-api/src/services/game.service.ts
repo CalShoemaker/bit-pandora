@@ -183,14 +183,14 @@ export class GameService {
         }
 
         const game:GameState = this.getById(id);
-        const { status, players } = game;
+        const { players } = game;
         const { give, take } = solution;
 
         const merged = give.length > 0 ? give.concat(take): take;
         let mutate = {};
 
         // Destructure from Player or game
-        const { tiles, history, canPlay } = status.players === 1 ? game : player.games.current;
+        const { tiles, history, canPlay } = player.games.current;
 
         const lastInHistory = history[history.length - 1] || [];
         const _lastInHistory = lastInHistory.reduce((b, a) => b + a, 0);
@@ -219,23 +219,19 @@ export class GameService {
                 });
             }
 
-            if(!victim || status.players === 1){
-                // Mutation to apply
-                mutate = {
-                    canPlay: [],
-                    tiles: tiles.filter(tile => !merged.includes(tile))
-                };
-            } else {
-                player.games.current.canPlay = [];
-                let tiles = player.games.current.tiles.filter(tile => !merged.includes(tile));
-                player.games.current.tiles = tiles;
-                players[player.pid] = player;
-                if(victim) players[victim.pid] = victim;
-                mutate = {
-                    players
-                }
-            }
+            player.games.current.canPlay = [];
 
+            let tiles = player.games.current.tiles.filter(tile => !merged.includes(tile));
+            
+            player.games.current.tiles = tiles;
+            players[player.pid] = player;
+            
+            if(victim) players[victim.pid] = victim;
+
+            mutate = {
+                players
+            }
+    
             return this.updateById(id, mutate);   
         } else {
             return { inLast, inTiles, inCanPlay}
