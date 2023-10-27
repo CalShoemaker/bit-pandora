@@ -2,7 +2,7 @@ import { GameState } from ".";
 
 const pandoraMutations = {
     Update: (state:GameState, payload:GameState) => Object.assign(state, payload),
-    Merge: (state:GameState, payload:GameState) => Object.assign({},state, payload),
+    Merge: (state:GameState, payload:GameState) => Object.assign({}, state),
 
     // SetPlaying: (state:GameState, isPlaying:boolean) => state.isPlaying,
     // Remove: (state:GameState, n:number) => state.tiles?.splice(state.tiles.indexOf(n), 1),
