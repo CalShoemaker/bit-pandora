@@ -50,7 +50,6 @@
 
         },
         mounted(){
-            console.log(this.history, this.canPlay, this.tiles)
         },
         methods: {
             ...mapActions('pandoraModule', [
@@ -189,7 +188,7 @@
 }
 
 .flip-card.closed .flip-card-front {
-    background-color: #2d0000;
+    background-color: #aa0101;
     border: 1px dashed rgb(255, 0, 0) inset,
 }
 

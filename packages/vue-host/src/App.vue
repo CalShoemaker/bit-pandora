@@ -1,6 +1,8 @@
 <template>
   <div class="relative flex max-h-screen flex-col overflow-hidden">
-    <router-view @do-link="doLink"></router-view>
+    <router-view @do-link="doLink" :key="$route.fullPath" v-slot="{ Component }">
+      <component :is="Component"></component>
+    </router-view>
   </div>
 </template>
 

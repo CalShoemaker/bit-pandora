@@ -19,6 +19,7 @@ const routes = [{
     props: true
 },{
     path: "/game/:id/:pid",
+    meta: { refresh: true },
     component: Game,
     props: true
 }];
