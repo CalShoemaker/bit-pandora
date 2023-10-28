@@ -1,6 +1,6 @@
 <template>
     <!-- NOTE: Wrap Game in Player as a game requires a player to render. -->
-    <div class="flex flex-col bp-game" :v-if="player && pid" :class="{ traditional: player && player.isTraditional || true }" :key="gameKey">
+    <div class="flex flex-col bp-game" :v-if="player && pid && status.active" :class="{ traditional: player && player.isTraditional || true }" :key="gameKey">
         <div class="flex flex-row h-20">
             <div class="flex flex-grow" :v-if="player">
                 {{  player.name }} 
@@ -8,11 +8,7 @@
             <div class="flex flex-grow" :v-if="opponent">
                 {{  opponent.name }}
             </div>
-            <div class="flex flex-none">
-                {{  status.active }}
-            </div>
         </div>
-
         <div class="flex-auto bp-game--board" v-if="player && pid">
             <Tiles  :player="player" 
                     :pid="pid" 
@@ -41,7 +37,7 @@
             </div>
         </template>
 
-        <template v-if="guest.active">
+        <template v-if="guest.active && !status.active">
             <div class="flex-auto bp-game--board">
                 <div class="">
                     <input v-model="guest.name" />
@@ -70,21 +66,18 @@
                 }
             }
         },
-        created() {
+        mounted() {
             // TODO: Hoist this condition into Setup.
             if(this.id && this.pid) {
                 this.guest.active = false;
-
                 this.setup(this.id).then(data => {
                     data.channel.onmessage = (e:any)=>{
-                        //const dat = JSON.parse(e.data);
                         this.getGame(this.gid);
                     }
                 })
             }
         },
         watch: {
-
             gid(newID, oldID) {
                 if(!this.id || newID !== oldID) {
                    this.gotoGame(newID);
@@ -102,16 +95,17 @@
                 'players',
                 'status',
                 'channel',
-                'pKeys'
+                'pKeys',
+                'rematch'
             ]),
             history(){
-                return JSON.parse(JSON.stringify(this.historyById(this.pid))) || []
+                return this.pid ? this.historyById(this.pid) : []
             },
             tiles(){
-                return JSON.parse(JSON.stringify(this.tilesById(this.pid))) || []
+                return this.pid ? this.tilesById(this.pid) : []
             },
             canPlay(){
-                return JSON.parse(JSON.stringify(this.canPlayById(this.pid))) || []
+                return this.pid ? this.canPlayById(this.pid) : []
             },
             opponent(){
                 if(this.pKeys.length > 1)
@@ -120,7 +114,7 @@
                     return this.players[o];
                 } else {
                     return {
-                        name: 'boo',
+                        name: 'Waiting...',
                         games: {
                             history: []
                         }
@@ -132,7 +126,7 @@
                     return this.players[this.pid];
                 } else {
                     return {
-                        name: 'boo',
+                        name: 'Waiting...',
                         games: {
                             history: []
                         }
@@ -147,16 +141,15 @@
                 'join',
                 'newPlayer',
                 'chirp',
-                'getGame'
+                'getGame',
+                'swapGame'
             ]),
             forceRerender() {
                 this.gameKey += 1;
             },
             joinGame(){
                 this.newPlayer({name: this.guest.name, isTraditional:this.status.isTraditional, isFlat:this.status.isFlat }).then(GuestPlayer => {
-                    console.log(GuestPlayer)
                     this.join({ player:GuestPlayer, gid:this.id }).then(game=>{
-                        console.log("2", GuestPlayer)
                         this.$emit('doLink', '/game/' + game.id + '/' + GuestPlayer.pid);
                     })
                 });
@@ -166,8 +159,29 @@
                 this.$emit('doLink', "/game/" + gid + '/' + this.player.pid);
             },
             newGame() {
-                const player = this.player;
-                return this.init({ player, type: 'QUICK'})
+                this.channel.close();
+                // // const player = this.player;
+                // // return this.init({ player, type: 'QUICK'})
+                let rematch = [];
+                //let ps = JSON.parse(JSON.stringify(this.players));
+                let ps = this.players;
+
+                for(const pid in ps){
+                    ps[pid].games.history.push(this.players[pid].games.current)
+                    ps[pid].games.current = {
+                        id: this.rematch,
+                        pid: pid+0,
+                        tiles:[1,2,3,4,5,6,7,8,9],
+                        history:[],
+                        canPlay:[]
+                    };
+                    rematch.push(ps[pid])
+                }
+                this.init({ players:rematch, type:"QUICK", playerLen: rematch.length, id: this.rematch }).then(() =>{
+                    this.$emit('doLink', '/game/' + this.rematch + '/' + this.player.pid);
+                })
+
+                //this.$emit('doLink', "/newgame/");
             }
         },
         components: {

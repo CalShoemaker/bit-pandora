@@ -11,7 +11,8 @@ const pandoraGetters = {
     gid: (state:GameState) => state.id,
     players: (state:GameState) => state.players,
     status: (state:GameState) => state.status,
-    channel: (state:GameState) => state.channel
+    channel: (state:GameState) => state.channel,
+    rematch: (state:GameState) => state.rematch
 }
 
 export default pandoraGetters;

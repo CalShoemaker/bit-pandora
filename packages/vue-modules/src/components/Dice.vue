@@ -74,8 +74,6 @@
             if(this.player && this.id) this.Cast({player, id, d});
         },
         pointerDown(e:Event) {
-          
-            console.log(this.history, this.canPlay);
 
             this.pointer.active = true;
             this.rolling = true;
@@ -94,7 +92,6 @@
                   this.pointer.last = pointer;
                   this.rollDice(this.player, this.id, this.selected.length);
               }
-              console.log(this.history, this.canPlay)
               this.pointer.active = false;
   
         },

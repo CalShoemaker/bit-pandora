@@ -55,7 +55,7 @@
             newQuickGame(){
                 if(this.state.name.length > 2){
                     this.newPlayer({name: this.state.name, isTraditional:this.state.isTraditional, isFlat:this.state.isFlat }).then(UserPlayer => {
-                        this.init({ player:UserPlayer, type:"QUICK", players: this.state.players }).then(game=>{
+                        this.init({ players:[UserPlayer], type:"QUICK", playerLen: this.state.players }).then(game=>{
                             this.$emit('doLink', 'game/' + game.id + '/' + UserPlayer.pid);
                         })
                     });

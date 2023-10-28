@@ -1,6 +1,6 @@
 import { GameState } from ".";
 
-const uri = "http://localhost:8081/api/";
+const uri = "http://192.168.0.98:8081/api/";
 
 const postOptions = {
     method: "POST",
@@ -13,9 +13,19 @@ const getOptions = {
 };
 
 const pandoraActions = {
+    rematch(context:any, config:any) {
+
+        const GameOptions = {
+            ...postOptions,
+            body: JSON.stringify(config)
+        };
+
+        return fetch(uri, GameOptions).then(response => response.json()).then(data=>{
+            context.commit("Update", data);
+            return data;
+        });
+    },
     init(context:any, config:any) {
-        // Ensure config data
-        // config = (config.name && config.type || config.player && config.type) ? config : { name: "Player One", type:"QUICK" } ;
 
         const GameOptions = {
             ...postOptions,
@@ -32,11 +42,16 @@ const pandoraActions = {
             ...getOptions
         };
             
-        return fetch(uri + id, GetGameOptions).then(res=>res.json()).then(data=>{        
-            data.channel = new EventSource(uri + id + '/channel');
+        return fetch(uri + id, GetGameOptions).then(res=>res.json()).then(data=>{      
+            if(!data.channel) {
+                data.channel = new EventSource(uri + id + '/channel');
+            }
             context.commit("Update", data);
             return data;
         });
+    },
+    swapGame(context: any, id:number){
+        context.commit("Update", {id});
     },
     getGame(context:any, id:number){
         const GetGameOptions = {
@@ -49,9 +64,6 @@ const pandoraActions = {
         });
     },
     join(context:any, config:any) {
-        // Ensure config data
-        // config = (config.name && config.type || config.player && config.type) ? config : { name: "Player One", type:"QUICK" } ;
-
         const GameOptions = {
             ...postOptions,
             body: JSON.stringify(config)
@@ -102,9 +114,10 @@ const pandoraActions = {
         return fetch(uri + 'player/'+ id, GetPlayerOptions).then(res=>res.json());
     },
     chirp(context:any, raw:string){
-        let _raw:GameState = JSON.parse(JSON.stringify(raw));
-        if(_raw){
-            return context.commit("Merge", _raw);
+        //let _raw:GameState = JSON.parse(JSON.stringify(raw));
+        
+        if(raw){
+            return context.commit("Merge", raw);
         }
     }
 }

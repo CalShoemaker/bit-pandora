@@ -4,9 +4,11 @@ import { stat } from 'fs';
 // TODO: Improve typings when adding other types
 type QuickGame = {
     player?: Player,
-    players: number,
+    players: Array<Player>,
+    playerLen: number,
     name: string,
-    type: string
+    type: string,
+    id?: number
 }
 
 // Game Status shape
@@ -49,7 +51,8 @@ export type GameState = {
     players?: object,
     history?: Array<Array<number>>,
     tiles: Array<number>,
-    channel?:any
+    channel?:any,
+    rematch?: number,
 }
 
 @Injectable()
@@ -115,7 +118,7 @@ export class GameService {
         const playerLen = Object.keys(players).length;
         // TODO: Abstract game status update out
         // BL: First play activates game 
-        if(history.length === 1 && status.players === 1 || status.players>1 && playerLen >1){
+        if(playerLen === status.players){
             status.active = true;
         }
 
@@ -145,6 +148,7 @@ export class GameService {
             status.score = score;
 
             game.status = status;
+            game.rematch = new Date().valueOf();
             player.games.history.push(game.status);
         }
 
@@ -264,23 +268,27 @@ export class GameService {
         return player;
     }
 
+    public Rematch(players:Array<Player>) {
+        
+    }
+
     public JoinGame(config: any) {
         if(config.gid && config.player) {
             let game = this.history[config.gid];
+
             let { players, status } = game;
             players[config.player.pid] = config.player;
             let ps = Object.keys(game.players).length;
 
-            //if(game.status.players <= ps) return; 
-
-            //if(ps === game.status.players + 0){
+            if(ps === game.status.players){
                 status.active = true;
-            //}
+            }
+
             let mutate = {
                 players, 
                 status
             }
-            
+                
             return this.updateById(config.gid, mutate)
         } 
 
@@ -288,26 +296,30 @@ export class GameService {
     
     // New Quick Game
     public NewQuickGame(config: QuickGame) {
-        const { player, type, players } = config;
-        const game = this.newGame(player, type, players);
+
+        const { players, type, playerLen, id } = config;
+        const game = this.newGame(players, type, playerLen, id);
 
         return game as GameState;
     }
 
     // New Game from Player & Type
-    newGame(player: Player, type: string, players:number) {
-        const newGame = this.createGame(player, type, players);
+    newGame(players:Array<Player>, type: string, playerLen:number, id:number) {
+        const newGame = this.createGame(players, type, playerLen, id);
         return this.setGameHistory(newGame);
     }
 
     // New raw game from Player by Type
-    createGame(player: Player, type: string, ps:number) {
-        const id = new Date().valueOf();
-        const players = {};
-        let game = {};
+    createGame(players: Array<Player>, type: string, ps:number, gid:number) {
 
-        player.games.current.id = id;
-        players[player.pid] = player;
+        const id = gid ? gid : new Date().valueOf();
+        const playersById = {};
+
+        let game = {};
+        players.forEach(player=> {
+            player.games.current.id = id;
+            playersById[player.pid] = player
+        });
         
         const status:GameStatus = {
             players: ps || 1,
@@ -330,7 +342,7 @@ export class GameService {
                 game =  {
                     ...defaultGame,
                     type,
-                    players
+                    players: playersById
                 };
                 break;
             default:

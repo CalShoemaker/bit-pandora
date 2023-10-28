@@ -41,7 +41,8 @@ export type GameState = {
     players: Array<Player> | [],
     history: Array<Array<number>> | [],
     tiles: Array<number>,
-    channel?:any
+    channel?:any,
+    rematch?: number
 }
 
 // Default game
