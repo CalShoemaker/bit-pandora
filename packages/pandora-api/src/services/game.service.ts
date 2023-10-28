@@ -1,59 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { stat } from 'fs';
-
-// TODO: Improve typings when adding other types
-type QuickGame = {
-    player?: Player,
-    players: Array<Player>,
-    playerLen: number,
-    name: string,
-    type: string,
-    id?: number
-}
-
-// Game Status shape
-type GameStatus = {
-    players: number,
-    finish?: string,
-    win: boolean,
-    lose: boolean,
-    active: boolean,
-    score: number
-}
-
-// Game Slice
-export type GameSlice = {
-    id?: number,
-    pid: number,
-    tiles: Array<number>,
-    history: Array<Array<number>>,
-    canPlay: Array<Array<number>>
-}
-
-// Player type
-export type Player = {
-    pid: number,
-    name?: string,
-    isTraditional?: boolean,
-    isFlat?: boolean,
-    games?: {
-        current?: GameSlice,
-        history?: any,
-    }
-}
-
-// Game shape
-export type GameState = {
-    id: number,
-    type: string,
-    status: GameStatus,
-    canPlay?: Array<Array<number>>,
-    players?: object,
-    history?: Array<Array<number>>,
-    tiles: Array<number>,
-    channel?:any,
-    rematch?: number,
-}
+import { GameState, GameSlice, GameStatus, Players, Player, QuickGame } from './game.types';
 
 @Injectable()
 export class GameService {
@@ -87,6 +33,39 @@ export class GameService {
         return this.history[id];
     }
 
+    private hasFinish(
+        hasPlay: Array<Array<number>>, 
+        score: number, 
+        history:Array<Array<number>>, 
+        max: number,
+        player:Player, 
+        players: Players, 
+        status: GameStatus
+        ){
+        if(history.length > 0 && hasPlay.length === 0 || score === 0) {
+            // Zero out to prevent object link recurssion
+            //game.players = [];
+
+            if(score > 0) {
+                let winner = "Pandora";
+                
+                if(max > 1){
+                    for (const [key, value] of Object.entries(players)) {
+                        if(key !== player.pid.toString()){
+                            winner = value.name;
+                        }
+                    }
+                }
+                status.lose = true;
+                status.finish = winner;
+            } else {
+                status.win = true;
+                status.finish = player.name;
+            }
+            return true;
+        }
+        return false;
+    }
     // Player (player) can, with a game id (id), cast a number (d) dice. 
     public Cast(player:Player, id:number, d:number) {
 
@@ -99,7 +78,7 @@ export class GameService {
         let mutate = {};
 
         // Destructure from Player or game
-        const { tiles, history, canPlay } = status.players === 1 ? game : player.games.current;
+        const { tiles, history, canPlay } = player.games.current;
 
         // To act on a game, a Player may not already have a solution space.
         if(canPlay.length !== 0 ) return { message: "Player has avilable options.", player, id, canPlay };
@@ -115,62 +94,28 @@ export class GameService {
 
 
         const hasPlay = this.solutionSpace(tiles, total);
-        const playerLen = Object.keys(players).length;
+        const max = Object.keys(players).length;
         // TODO: Abstract game status update out
         // BL: First play activates game 
-        if(playerLen === status.players){
-            status.active = true;
-        }
 
-        // BL: In context of a Cast, if history & no solution space - End
-        if(history.length > 0 && hasPlay.length === 0 || score === 0) {
-            // Zero out to prevent object link recurssion
-            //game.players = [];
-
-
-            if(score > 0) {
-                let winner = "Pandora";
-                if(playerLen > 1){
-                    for (const [key, value] of Object.entries(players)) {
-                        if(key !== player.pid.toString()){
-                        winner = value.name;
-                        }
-                    }
-                }
-                status.lose = true;
-                status.finish = winner;
-            } else {
-                status.win = true;
-                status.finish = player.name;
-            }
-
+        if(this.hasFinish(hasPlay, score, history, max, player, players, status)){
             status.active = false;
             status.score = score;
-
             game.status = status;
-            game.rematch = new Date().valueOf();
+            player.games.current.canPlay = [];
             player.games.history.push(game.status);
-        }
-
-
-        if(status.players === 1){
-            // Mutation to apply
-            mutate = {
-                status,
-                canPlay: hasPlay || [],
-                history: future
-            };
         } else {
             // Mutation to apply
             player.games.current.canPlay = hasPlay || [];
             player.games.current.history = future;
             players[player.pid] = player;
-            mutate = {
-                status,
-                players
-            };
         }
-        
+
+        mutate = {
+            status,
+            players
+        };
+
         return this.updateById(id, mutate);
     }
 
@@ -243,7 +188,7 @@ export class GameService {
     }
     
     // New Player
-    public NewPlayer(config?: Player) {
+    public async NewPlayer(config: Player) {
         const pid = new Date().valueOf();
         
         const gameSlice:GameSlice = {
@@ -256,29 +201,27 @@ export class GameService {
         const player = {
             name: config?.name,
             pid: pid,
-            isFlat: config.isFlat,
-            isTraditional: config.isTraditional || true,
+            isFlat: true,
+            isTraditional: true,
             games: {
                 current: gameSlice,
                 history: []
             }
         } as Player;
 
-        this.players[player.pid] = player;
+        //this.players[player.pid] = player;
         return player;
     }
 
-    public Rematch(players:Array<Player>) {
-        
-    }
 
     public JoinGame(config: any) {
         if(config.gid && config.player) {
             let game = this.history[config.gid];
-
             let { players, status } = game;
-            players[config.player.pid] = config.player;
             let ps = Object.keys(game.players).length;
+            
+            config.player.games.current.id = config.gid;
+            players[config.player.pid] = config.player;
 
             if(ps === game.status.players){
                 status.active = true;
@@ -289,7 +232,7 @@ export class GameService {
                 status
             }
                 
-            return this.updateById(config.gid, mutate)
+            return this.updateById(config.gid, mutate);
         } 
 
     }
@@ -297,30 +240,25 @@ export class GameService {
     // New Quick Game
     public NewQuickGame(config: QuickGame) {
 
-        const { players, type, playerLen, id } = config;
-        const game = this.newGame(players, type, playerLen, id);
+        const { players, type, max, id } = config;
+        const game = this.newGame(type, max, id, players);
 
         return game as GameState;
     }
 
     // New Game from Player & Type
-    newGame(players:Array<Player>, type: string, playerLen:number, id:number) {
-        const newGame = this.createGame(players, type, playerLen, id);
+    newGame(type: string, max:number, id:number, players?:Players) {
+        const newGame = this.createGame(type, max, id, players);
         return this.setGameHistory(newGame);
     }
 
     // New raw game from Player by Type
-    createGame(players: Array<Player>, type: string, ps:number, gid:number) {
-
-        const id = gid ? gid : new Date().valueOf();
-        const playersById = {};
-
+    createGame(type: string,  ps:number, gid:number, players?: Players) {
+        const stamp = new Date().valueOf();
+        const id = gid ? gid : stamp;
+        let playersById = {};
         let game = {};
-        players.forEach(player=> {
-            player.games.current.id = id;
-            playersById[player.pid] = player
-        });
-        
+
         const status:GameStatus = {
             players: ps || 1,
             win: false,
@@ -334,8 +272,21 @@ export class GameService {
             canPlay: [],
             status,
             history:[],
+            rematch: stamp + 1,
             tiles: [1, 2, 3, 4, 5, 6, 7, 8, 9]
         };
+
+        // players.forEach(player=> {
+        //     player.games.current.id = id;
+        //     playersById[player.pid] = player
+        // });
+        
+        if(players){
+            for (const [key, value] of Object.entries(players)) {
+                value.games.current.id = id;
+                playersById[key] = value;
+            }
+        }
 
         switch(type) {
             case 'QUICK':

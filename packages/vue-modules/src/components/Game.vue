@@ -1,6 +1,6 @@
 <template>
-    <!-- NOTE: Wrap Game in Player as a game requires a player to render. -->
-    <div class="flex flex-col bp-game" :v-if="player && pid && status.active" :class="{ traditional: player && player.isTraditional || true }" :key="gameKey">
+
+    <div class="flex flex-col bp-game traditional" :v-if="player && pid && status.active" :key="gameKey">
         <div class="flex flex-row h-20">
             <div class="flex flex-grow" :v-if="player">
                 {{  player.name }} 
@@ -18,15 +18,11 @@
                     :canPlay="canPlay"
                     :tiles="tiles"
                     class="tiles" />
-            <Cube v-if="false">
-                <template v-slot:game>
-                    <Tiles :player="player" :id="id" />
-                </template>
-            </Cube>
         </div>
         <div class="flex-none">
             <Player v-if="player && pid" :id="id" :player="player" :history="history" :canPlay="canPlay" />
         </div>
+        
         <template v-if="status && status.win || status && status.lose">
             <div class="text-white">
                 <h2>Game Over {{ player.name || "booo" }}. Player: {{ status.finish }} won!</h2>
@@ -35,7 +31,7 @@
                 </ul>
                 <button v-on:click="newGame()">New Quick Game</button>
             </div>
-        </template>
+        </template> 
 
         <template v-if="guest.active && !status.active">
             <div class="flex-auto bp-game--board">
@@ -53,6 +49,9 @@
     import Player from './Player.vue';
     import Tiles from './Tiles.vue';
     import Cube from './Cube.vue';
+
+    // Flatten Proxy antipattern, Always return an object.
+    const $ = (o:any) => JSON.parse(JSON.stringify(o)) || { status: 'fail', o };
 
     export default defineComponent({
         props: ['id', 'pid'],
@@ -123,7 +122,7 @@
             },
             player(){
                 if(this.pKeys.length > 0 && this.pid && this.players[this.pid]){
-                    return this.players[this.pid];
+                    return $(this.players)[this.pid];
                 } else {
                     return {
                         name: 'Waiting...',

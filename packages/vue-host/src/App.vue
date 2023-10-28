@@ -25,28 +25,11 @@ body {
     -webkit-user-select:none;
     height: calc(100vh - 80px);
     width: 100%;
-    background-image: url("media/images/temple-city.png");
-    background-size: 110% 110%;              /* <------ */
-    background-repeat: no-repeat;
-    background-position: 0 0;  
-    animation: gradient 60s ease infinite;
 
     #bitPandoraHost{
       max-width: 430px;
       max-height: 850px;
       margin:0 auto;
-    }
-}
-
-@keyframes gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
     }
 }
 

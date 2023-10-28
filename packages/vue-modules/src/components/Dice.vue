@@ -71,6 +71,7 @@
             return this.selected.includes(i);
         },
         rollDice(player:any, id:number, d:number) {
+          console.log({player: this.player, id: this.id})
             if(this.player && this.id) this.Cast({player, id, d});
         },
         pointerDown(e:Event) {
