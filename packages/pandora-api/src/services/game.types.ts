@@ -36,6 +36,7 @@ export type GameSlice = {
 export type Player = {
     pid: number,
     name?: string,
+    emoji?: object,
     isTraditional?: boolean,
     isFlat?: boolean,
     games?: {

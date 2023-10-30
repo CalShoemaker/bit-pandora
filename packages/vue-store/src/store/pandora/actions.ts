@@ -1,6 +1,6 @@
-import { GameState } from ".";
+import { GameState } from "./game.types";
 
-const uri = "http://192.168.0.98:8081/api/";
+const uri = "http://localhost:8081/api/";
 
 const postOptions = {
     method: "POST",
@@ -14,6 +14,18 @@ const getOptions = {
 
 const pandoraActions = {
     rematch(context:any, config:any) {
+
+        const GameOptions = {
+            ...postOptions,
+            body: JSON.stringify(config)
+        };
+
+        return fetch(uri, GameOptions).then(response => response.json()).then(data=>{
+            context.commit("Update", data);
+            return data;
+        });
+    },
+    initRematch(context:any, config:any) {
 
         const GameOptions = {
             ...postOptions,
@@ -75,7 +87,7 @@ const pandoraActions = {
         });
     },
     Cast(context:any, config:any){
-        const { player, id, n } = config;
+        const { id } = config;
         const CastGameOptions = {
             ...postOptions,
             body: JSON.stringify(config)

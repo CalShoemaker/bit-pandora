@@ -12,6 +12,9 @@
     import { defineComponent } from 'vue';
     import Header from "./Header.vue"
     export default defineComponent({
+        mounted(){
+            localStorage.removeItem('bp-pid')
+        },
         components: {
             Header
         }

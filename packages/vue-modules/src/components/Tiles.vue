@@ -1,5 +1,5 @@
 <template>
-    <div class="grid grid-cols-3 facet" :class="{ enabled: canPlay.length > 0 }">
+    <div class="grid grid-cols-3 facet" :class="{ enabled: canPlay.length > 0 }" v-if="pid">
         <div v-for="(number, index) in range" 
              v-bind:key="index" 
              class="flip-card" 
@@ -9,7 +9,10 @@
                 taken:!tiles.includes(number),
                 closed: opponent && opponent.games.current && !opponent.games.current.tiles.includes(number)
             }" >
-            <div class="flip-card-inner flex items-center justify-center" v-touch:longtap="click('give', number)" v-touch="click('take', number)">
+            <div class="flip-card-inner flex items-center justify-center" 
+                v-touch:longtap="click('give', number)" v-touch="click('take', number)"
+                @pointerdown="pointerDown"
+                @pointerup="pointerUp">
                 <div class="flip-card-front flex items-center justify-center">
                     <span class="tile">{{ number }}</span>
                 </div>
@@ -33,13 +36,18 @@
     }
 
     export default defineComponent({
-        props: ['id', 'pid', 'player', 'opponent', 'history', 'canPlay', 'tiles'],
+        props: ['id', 'pid', 'opponent', 'tiles', 'history', 'canPlay'],
 
         data(){
             return {
                 given: [] as Array<number>,
                 selected: [] as Array<number>,
-                range:[1,2,3,4,5,6,7,8,9] as Array<number>
+                range:[1,2,3,4,5,6,7,8,9] as Array<number>,
+                pointer: {
+                    active: false,
+                    last: 0,
+                    i:0
+                }
             }
         },
         computed: {
@@ -47,7 +55,6 @@
                 'players',
                 'status'
             ]),
-
         },
         mounted(){
         },
@@ -55,6 +62,18 @@
             ...mapActions('pandoraModule', [
                 'Pick'
             ]),
+            pointerDown(e:Event) {
+                this.pointer.active = true;
+                this.pointer.last = new Date().valueOf();
+                this.pointer.i = setTimeout(() => {
+                    if(this.pointer.active){
+                        this.pointer.active = false;
+                    }
+                }, 1000);
+            },
+            pointerUp(e:Event | null) {
+                this.pointer.active = false;
+            },
             pushOrPop(t:Array<number>, f:Array<number>, n: number){
                 if(!t.includes(n) && !f.includes(n)) {
                     t.push(n);
@@ -100,7 +119,7 @@
             
             pick() {
                 this.Pick({
-                    player: this.player, 
+                    pid: this.pid, 
                     id: this.id, 
                     solution: {
                         give: this.given, 
@@ -146,12 +165,15 @@
 
  /* The flip card container - set the width and height to whatever you want. We have added the border property to demonstrate that the flip itself goes out of the box on hover (remove perspective if you don't want the 3D effect */
 .flip-card {
+    
   background-color: transparent;
   width: 135px;
   height: 135px;
   perspective: 1000px; /* Remove this if you don't want the 3D effect */
   border: 1px dashed #900b04;
   box-shadow: 1px 1px 20px 0px rgba(0,0,0,0.1) inset;
+
+  transition: background-color 500ms;
 }
 
 /* This container is needed to position the front and back side */
@@ -172,11 +194,14 @@
 
 .flip-card.given .flip-card-back,
 .flip-card.given .flip-card-front{
+
+    transition: background-color 500ms;
     box-shadow: 1px 1px 10px 5px #ff0000 inset;
 }
 
 .flip-card.given .flip-card-back .tile,
 .flip-card.given .flip-card-front .tile{
+    transition: background-color 500ms;
     background-color: rgb(120, 0, 0);
     color: #ff0d00;
     box-shadow: 1px 1px 10px 5px #ff0000,3px 3px 0px 2px rgb(132, 0, 0);
@@ -188,6 +213,8 @@
 }
 
 .flip-card.closed .flip-card-front {
+
+    transition: background-color 500ms;
     background-color: #aa0101;
     border: 1px dashed rgb(255, 0, 0) inset,
 }

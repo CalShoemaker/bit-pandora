@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GameState, GameSlice, GameStatus, Players, Player, QuickGame } from './game.types';
+import { type GameState , type GameSlice, type GameStatus, type Players, type Player, type QuickGame } from './game.types';
 
 @Injectable()
 export class GameService {
@@ -13,7 +13,7 @@ export class GameService {
         this.players = {};
     }
     
-    public getAll = () => this.history;
+    public getAll = () => { return {history:this.history, players:this.players}};
 
     // TODO: Improve randomish die. 
     public die = (min:number, max:number) => min + Math.floor(Math.random() * (max - min + 1));
@@ -52,7 +52,7 @@ export class GameService {
                 if(max > 1){
                     for (const [key, value] of Object.entries(players)) {
                         if(key !== player.pid.toString()){
-                            winner = value.name;
+                            winner = players[key] && players[key].name ? players[key].name :winner ;
                         }
                     }
                 }
@@ -67,18 +67,20 @@ export class GameService {
         return false;
     }
     // Player (player) can, with a game id (id), cast a number (d) dice. 
-    public Cast(player:Player, id:number, d:number) {
+    public Cast(pid:number, id:number, d:number) {
 
         // To Cast, a Player must act on a game through the id. 
-        if(!player || !id || !d) return { message: "Player or ID or Number missing." };
+        if(!pid || !id || !d) return { message: "Player or ID or Number missing." };
 
         // Link game
         const game:GameState = this.getById(id);
+        const player:Player = this.getPlayerById(pid);
+
         const { status, players } = game;
         let mutate = {};
 
         // Destructure from Player or game
-        const { tiles, history, canPlay } = player.games.current;
+        let { tiles, history, canPlay } = player.games.current;
 
         // To act on a game, a Player may not already have a solution space.
         if(canPlay.length !== 0 ) return { message: "Player has avilable options.", player, id, canPlay };
@@ -120,10 +122,10 @@ export class GameService {
     }
 
     // Player with a game ID can provide a solution
-    public Pick(player:Player, id:number, solution:any) {
+    public Pick(pid:number, id:number, solution:any) {
         
         // To Pick, a Player must act on a game through the id. 
-        if(!player || !id || !solution) return { message: "Player, ID, or Solution is missing," };
+        if(!pid || !id || !solution) return { message: "Player, ID, or Solution is missing," };
 
         let checkSubset = (parentArray, subsetArray) => {
             return subsetArray.every((el) => {
@@ -132,6 +134,8 @@ export class GameService {
         }
 
         const game:GameState = this.getById(id);
+        const player:Player = this.getPlayerById(pid);
+
         const { players } = game;
         const { give, take } = solution;
 
@@ -190,16 +194,20 @@ export class GameService {
     // New Player
     public async NewPlayer(config: Player) {
         const pid = new Date().valueOf();
-        
+        let emoji;
         const gameSlice:GameSlice = {
             pid: pid,
             history: [],
             canPlay: [],
             tiles: [1,2,3,4,5,6,7,8,9]
         };
-
+        if(config.emoji){
+            emoji = config.emoji + '';
+            JSON.parse(emoji);
+        }
         const player = {
             name: config?.name,
+            emoji: emoji,
             pid: pid,
             isFlat: true,
             isTraditional: true,
@@ -209,19 +217,21 @@ export class GameService {
             }
         } as Player;
 
-        //this.players[player.pid] = player;
+        this.players[player.pid] = player;
         return player;
     }
 
 
     public JoinGame(config: any) {
-        if(config.gid && config.player) {
-            let game = this.history[config.gid];
+        if(config.gid && config.pid) {
+            const game = this.history[config.gid];
+            const player = this.getPlayerById(config.pid);
             let { players, status } = game;
             let ps = Object.keys(game.players).length;
             
-            config.player.games.current.id = config.gid;
-            players[config.player.pid] = config.player;
+            //player.games.current.id = config.gid;
+            players[config.pid] = player;   
+            game.players[config.pid] = player;
 
             if(ps === game.status.players){
                 status.active = true;
@@ -346,3 +356,5 @@ export class GameService {
         return reduce;
     }    
 }
+
+export default GameService;

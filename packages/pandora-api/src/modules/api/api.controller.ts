@@ -12,7 +12,8 @@ import {
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { Observable, interval, map } from 'rxjs';
 import { EventsService } from 'src/services/events.service';
-import { GameService, GameState } from 'src/services/game.service';
+import { GameService } from 'src/services/game.service';
+import { type GameState , type GameSlice, type GameStatus, type Players, type Player, type QuickGame } from '../../services/game.types';
 
 interface MessageEvent {
   data: string | object
@@ -65,18 +66,18 @@ export class ApiController {
 
   @Post('/:id/cast')
   async cast(@Body() config): Promise<any> {
-      const { player, id, d } = config;
+      const { pid, id, d } = config;
 
-      const game = this.gameService.Cast(player, id, d);
+      const game = this.gameService.Cast(pid, id, d);
       this.eventsService.emit(game);
       return game;
   }
 
   @Post('/:id/pick')
   async pick(@Body() config): Promise<any> {
-      const { player, id, solution } = config;
+      const { pid, id, solution } = config;
 
-      const game = this.gameService.Pick(player, id, solution);
+      const game = this.gameService.Pick(pid, id, solution);
       this.eventsService.emit(game);
       return game;
   }

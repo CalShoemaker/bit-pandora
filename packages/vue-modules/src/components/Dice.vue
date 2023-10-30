@@ -1,6 +1,6 @@
 <template>
     <div class="dice-box relative flex-none"
-        v-if="player" 
+        v-if="pid" 
         v-touch:swipe="handleSwipeUp"
         @pointerdown="pointerDown"
         @pointerup="pointerUp">
@@ -32,7 +32,7 @@
     
 
     export default defineComponent({
-    props: ['id', 'pid', 'player', 'canPlay', 'history'],
+    props: ['id', 'pid', 'history', 'tiles', 'canPlay'],
     data(){
       return {
         rolling: false,
@@ -48,6 +48,9 @@
             startPosY:0
         }
       }
+    },
+    mounted(){
+
     },
     computed: {
         ...mapGetters('pandoraModule', [
@@ -70,12 +73,12 @@
         inSelected(i:number){
             return this.selected.includes(i);
         },
-        rollDice(player:any, id:number, d:number) {
-          console.log({player: this.player, id: this.id})
-            if(this.player && this.id) this.Cast({player, id, d});
+        rollDice(pid:number, id:string, d:number) {
+
+            if(this.pid && id) this.Cast({pid, id:+id, d});
         },
         pointerDown(e:Event) {
-
+          
             this.pointer.active = true;
             this.rolling = true;
             this.pointer.last = new Date().valueOf();
@@ -91,7 +94,7 @@
 
               if(pointer > this.pointer.last + 1000){
                   this.pointer.last = pointer;
-                  this.rollDice(this.player, this.id, this.selected.length);
+                  this.rollDice(this.pid, this.id, this.selected.length);
               }
               this.pointer.active = false;
   
@@ -110,9 +113,9 @@
             return handler;
         },
         handleSwipeUp(){
-            if(this.player && this.id){
+            if(this.pid && this.id){
                 this.rolling = false;
-                this.rollDice(this.player, this.id, this.selected.length);
+                this.rollDice(this.pid, this.id, this.selected.length);
             } 
         }
     }

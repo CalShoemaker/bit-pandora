@@ -1,7 +1,8 @@
 <template>
   <div class="relative flex max-h-screen flex-col overflow-hidden">
-    <router-view @do-link="doLink" :key="$route.fullPath" v-slot="{ Component }">
-      <component :is="Component"></component>
+   
+    <router-view @do-link="doLink" @attach-player="attachPlayer" v-slot="{ Component }" :key="$route.fullPath">
+      <component :is="Component" :pid="pid"></component>
     </router-view>
   </div>
 </template>
@@ -10,11 +11,24 @@
 <script lang="ts">
   import { defineComponent } from 'vue';
 
-  // TODO: Background gradient with this color: 70c1b3
   export default defineComponent({
+    data(){
+      let bpPID = localStorage.getItem('bp-pid') || null;
+      return {
+        pid: bpPID ? +bpPID : null 
+      }
+    },
     methods: {
+      resetPlayer(){
+        localStorage.removeItem('bp-pid')
+      },
       doLink(target:string) {
         this.$router.push(target)
+      },
+      
+      attachPlayer(pid:string){
+        localStorage.setItem('bp-pid', pid);
+        this.pid = +pid;
       }
     }
   })
@@ -25,6 +39,7 @@ body {
     -webkit-user-select:none;
     height: calc(100vh - 80px);
     width: 100%;
+    background-color:rgb(71, 4, 0);
 
     #bitPandoraHost{
       max-width: 430px;

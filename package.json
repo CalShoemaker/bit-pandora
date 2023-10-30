@@ -1,6 +1,6 @@
 {
     "name": "bit-pandora",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Shut the box, Padroras box.",
     "main": "index.js",
     "scripts": {
