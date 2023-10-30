@@ -33,12 +33,12 @@ Shut the box, Padroras box.
 
 - Explicitly explained, temporary ruleset, for Pandora PVP; Shut The Box core game rules:
 
--- A Player has an option to roll one (1) or two (2) dice, the sum of which may be reduced from the tiles on the board.
--- A Player loses when unable to entirely distribute the result of a dice roll, and their score is the sum of the remaining tiles.
--- A Player wins when all tiles are removed , or an opponent loses.
--- A Player normally may only Pick a max of two (2) tiles per Cast, Pandora PvP has no limit.
--- A Player may Give a tile to an opponent by long pressing a tile (1000ms).
--- A Player may only Give tiles which factor into the sum of a dice Cast, already Picked by opponent, denoted as bright red bg.
+- A Player has an option to roll one (1) or two (2) dice, the sum of which may be reduced from the tiles on the board.
+- A Player loses when unable to entirely distribute the result of a dice roll, and their score is the sum of the remaining tiles.
+- A Player wins when all tiles are removed , or an opponent loses.
+- A Player normally may only Pick a max of two (2) tiles per Cast, Pandora PvP has no limit.
+- A Player may Give a tile to an opponent by long pressing a tile (1000ms).
+- A Player may only Give tiles which factor into the sum of a dice Cast, already Picked by opponent, denoted as bright red bg.
 
 ### Next Targets
 
