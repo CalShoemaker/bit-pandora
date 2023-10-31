@@ -1,4 +1,5 @@
 <template>
+    <!-- TODO: (P3) Stylize this viewchild. --> 
     <Header />
     <div class="flex flex-col p-5 bg-gray-900 text-white">
         <div>Welcome to Bit Pandora.</div>

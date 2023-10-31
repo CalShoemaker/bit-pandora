@@ -1,6 +1,5 @@
 <template>
   <div class="relative flex max-h-screen flex-col overflow-hidden">
-   
     <router-view @do-link="doLink" @attach-player="attachPlayer" v-slot="{ Component }" :key="$route.fullPath">
       <component :is="Component" :pid="pid"></component>
     </router-view>
@@ -19,13 +18,13 @@
       }
     },
     methods: {
+      // TODO: (P4) Remove in production.
       resetPlayer(){
         localStorage.removeItem('bp-pid')
       },
       doLink(target:string) {
         this.$router.push(target)
       },
-      
       attachPlayer(pid:string){
         localStorage.setItem('bp-pid', pid);
         this.pid = +pid;

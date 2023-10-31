@@ -27,6 +27,7 @@
     import { mapGetters, mapActions } from 'vuex';
     import { defineComponent, ref, reactive, toRaw } from 'vue';
 
+    // HRM... ?
     type Conditions = {
         h: Array<Array<number>>, 
         s: Array<number>, 
@@ -56,8 +57,6 @@
                 'status'
             ]),
         },
-        mounted(){
-        },
         methods: {
             ...mapActions('pandoraModule', [
                 'Pick'
@@ -74,9 +73,10 @@
             pointerUp(e:Event | null) {
                 this.pointer.active = false;
             },
-            pushOrPop(t:Array<number>, f:Array<number>, n: number){
+            // TODO: (P4) Use t.toSpliced(i, 1) once FF supports the method.
+            pushOrPop(t:Array<number>, f:Array<number>, n: number) {
                 if(!t.includes(n) && !f.includes(n)) {
-                    t.push(n);
+                    t = [...t,n];
                 } else {
                     const i = t.indexOf(n);
                     t.splice(i);
@@ -133,6 +133,7 @@
         }
     })
 </script>
+<!-- TODO: (P3) SCSS -->
 <style>
 .facet {
     pointer-events: none;
@@ -143,8 +144,7 @@
 .facet.enabled{
     pointer-events: all;
 }
-.tiles {
-}
+
 .tile {
     display: block;
     width: 60px;

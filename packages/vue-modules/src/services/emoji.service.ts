@@ -1,3 +1,4 @@
+// TODO: (P4) Complete library from stub below.
 const emojis =  [{
     icon:'🐵',
     code: '&#128053'
@@ -5,7 +6,7 @@ const emojis =  [{
     icon: '🐒',
     code:'&#128018'
 },{
-   icon: '🦍',
+    icon: '🦍',
     code: '&#129421'
 },{
     icon: '🐶',

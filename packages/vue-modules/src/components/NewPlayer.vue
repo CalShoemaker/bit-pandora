@@ -12,7 +12,7 @@
     </div>
 </template>
 <script lang="ts">
-    import { mapGetters, mapActions } from 'vuex';
+
     import { defineComponent } from 'vue';
     import emojis from '../services/emoji.service';
 

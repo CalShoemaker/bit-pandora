@@ -14,7 +14,7 @@ import { Observable, interval, map } from 'rxjs';
 import { EventsService } from 'src/services/events.service';
 import { GameService } from 'src/services/game.service';
 import { type GameState , type GameSlice, type GameStatus, type Players, type Player, type QuickGame } from '../../services/game.types';
-
+// TODO: Code Review.
 interface MessageEvent {
   data: string | object
 }

@@ -19,8 +19,7 @@
     import { mapGetters, mapActions } from 'vuex';
     import { defineComponent, ref, reactive } from 'vue';
     import NewPlayer from './NewPlayer.vue';
-import { disable } from 'colors';
-
+    // TODO: (P4) data() => Ref, Reactive.
     export default defineComponent({
         data(){
             return {
@@ -48,15 +47,17 @@ import { disable } from 'colors';
             },
             emojify:(e:string)=> e+';',
             newQuickGame(){
-                
-                if(this.name.length > 2){
-                    this.newPlayer({name: this.name, emoji:this.emoji }).then(UserPlayer => {
-                        this.$emit('attachPlayer', UserPlayer.pid);
-                        this.init({ type:"QUICK", playerLen: this.selected }).then(game=>{
-                            this.$emit('doLink', '/game/' + game.id + '/');
-                        })
-                    });
-                }
+                if(this.name.length <= 2) return;
+                // Create and register a new Player
+                this.newPlayer({name: this.name, emoji:this.emoji }).then(UserPlayer => {
+                    // Report Player ID to Host for connectivity & refresh resyncing.
+                    this.$emit('attachPlayer', UserPlayer.pid);
+                    // Create a game with anticipated player length.
+                    this.init({ type:"QUICK", playerLen: this.selected }).then(game=> {
+                        // Request Host navigate with router to game
+                        this.$emit('doLink', '/game/' + game.id + '/');
+                    })
+                });
             },
         },
         components:{
@@ -70,8 +71,5 @@ import { disable } from 'colors';
     -webkit-user-select:none;
     height: calc(100vh - 80px);
     width: 100%;
-    background-size: cover;              /* <------ */
-    background-repeat: no-repeat;
-    background-position: center center;  
 }
 </style>

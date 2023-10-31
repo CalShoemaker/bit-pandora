@@ -33,6 +33,7 @@
 
     export default defineComponent({
     props: ['id', 'pid', 'history', 'tiles', 'canPlay'],
+    // TODO: (P4) Refactor data to Ref & Reactive useState in setup()
     data(){
       return {
         rolling: false,
@@ -56,6 +57,7 @@
         ...mapGetters('pandoraModule', [
             'status'
         ]),
+        // TODO: (P4) Range should be a prop. Also, improve last dice abstraction logic. 3 const's to return an an array seems bad.
         range() {
             const h = this.history; // History
             const l = h ? h.length -1 : 0; // Last
@@ -74,11 +76,12 @@
             return this.selected.includes(i);
         },
         rollDice(pid:number, id:string, d:number) {
-
+            // TODO: (P4) Refactor implicit string to number casting
             if(this.pid && id) this.Cast({pid, id:+id, d});
         },
         pointerDown(e:Event) {
-          
+            // TODO: (P4) Remove the pointer fallback & leverage t-touch:longpress. 
+            // NOTE: Initally longpress was inconsistent across devices in testing.
             this.pointer.active = true;
             this.rolling = true;
             this.pointer.last = new Date().valueOf();
@@ -89,6 +92,8 @@
             }, 3000);
         },
         pointerUp(e:Event | null) {
+            // TODO: (P4) Remove the pointer fallback & leverage t-touch:swipe. 
+            // NOTE: Initally swipe was inconsistent across devices in testing.
               this.rolling = false;
               const pointer = new Date().valueOf();
 
@@ -100,6 +105,7 @@
   
         },
         handleTap(id:number){
+          // TODO: (P4) This can be improved.
             const handler = (direction:any, mouseEvent:Event) =>{
                 if(this.canPlay.length > 0) return;
                 if(this.selected.includes(id)){
@@ -113,6 +119,7 @@
             return handler;
         },
         handleSwipeUp(){
+          // TODO: (P3) Finalize issues with gesture vs cursor across devices.
             if(this.pid && this.id){
                 this.rolling = false;
                 this.rollDice(this.pid, this.id, this.selected.length);
@@ -121,6 +128,8 @@
     }
   });
 </script>
+
+<!-- TODO: (P2) Finalize SCSS iOS rendering issues & remove CSS fallbacks. -->
 <style>
   .dice-box {
     max-height: 90px;
@@ -156,16 +165,16 @@
       left: 25%;
   }
 
-    .dice {
-        pointer-events: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100px;
-        height: 100px;
-        transform-style: preserve-3d;
-        transition: transform 1s; 
-    }
+  .dice {
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100px;
+      height: 100px;
+      transform-style: preserve-3d;
+      transition: transform 1s; 
+  }
 
 .dice-wrap.rolling .dice-one{
     animation: rolling 3s infinite ease-in-out;
@@ -233,8 +242,6 @@
     background-color: #fff;
     box-shadow: inset 2px 2px #f2f2f2;
 }
-  
-
 
 .dice-wrap.selected .side{
     background-color:rgba(227, 218, 201, 1);
@@ -294,7 +301,6 @@
 }
 </style>
 <style lang="scss" noscript>
-
 
 .dice {
     position: absolute;;

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { type GameState , type GameSlice, type GameStatus, type Players, type Player, type QuickGame } from './game.types';
-
+// TODO: Code Review this file.
 @Injectable()
 export class GameService {
     private history;
@@ -15,7 +15,7 @@ export class GameService {
     
     public getAll = () => { return {history:this.history, players:this.players}};
 
-    // TODO: Improve randomish die. 
+    // TODO: (P4) Improve randomish die. 
     public die = (min:number, max:number) => min + Math.floor(Math.random() * (max - min + 1));
     
     // NOTE: Roll has implicit game logic as only 1 or 2 dice can be rolled at a time.
@@ -87,18 +87,15 @@ export class GameService {
 
         let dice = this.roll(d);
 
-        // TODO: Improve reducer as this is repetative code
+        // TODO: (P4) Improve reducer as this is repetative code
         const score = tiles.reduce((a:number, b:number) => a + b, 0);
         const total = dice.reduce((a:number, b:number) => a + b, 0);
 
         const future = [...history]; // The future is a set of histories
         future.push(dice); // The Force is strong...
 
-
         const hasPlay = this.solutionSpace(tiles, total);
         const max = Object.keys(players).length;
-        // TODO: Abstract game status update out
-        // BL: First play activates game 
 
         if(this.hasFinish(hasPlay, score, history, max, player, players, status)){
             status.active = false;
