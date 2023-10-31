@@ -1,6 +1,11 @@
 # bit-pandora
 
-Shut the box, Padroras box.
+Shut the box, Pandoras box.
+
+1. Roll 1 or 2 dice. 
+2. Take or Give tiles equal to dice sum.
+3. Lose when tile sums cant't equate to dice sum.
+4. Win with no tiles remaining on last dice cast.
 
 ## Todos
 
