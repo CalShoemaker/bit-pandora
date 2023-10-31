@@ -31,16 +31,6 @@
             updateEmoji: function (e: Event) {
                this.$emit('emoji', (e!.target as HTMLInputElement)!.value);
             }
-        },
-        computed: {
-            player(){
-                if(this.name.length > 1 && this.emoji !==0){
-
-                }
-            }
-        },
-        components: {
-
         }
     })
 </script>
