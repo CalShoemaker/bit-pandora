@@ -1,4 +1,4 @@
-import { GameState } from ".";
+import { GameState } from "./game.types";
 
 const pandoraMutations = {
   Update: (state: GameState, payload: GameState) =>
