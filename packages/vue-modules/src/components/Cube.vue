@@ -1,39 +1,33 @@
 <template>
-    <div class="scene">
-        <div class="cube">
-            <div class="cube__face cube__face--inside">
-              
-            </div>
-            <div class="cube__face cube__face--front">
-                <slot name="game"></slot>
-            </div>
-            <div class="cube__face cube__face--back">
-                <slot name="game"></slot>
-            </div>
-            <div class="cube__face cube__face--right">
-
-                <slot name="game"></slot>
-            </div>
-            <div class="cube__face cube__face--left">
-
-                <slot name="game"></slot>
-            </div>
-            <div class="cube__face cube__face--top">
-
-                <slot name="game"></slot>
-            </div>
-            <div class="cube__face cube__face--bottom">
-                <slot name="game"></slot>
-            </div>
-        </div>
+  <div class="scene">
+    <div class="cube">
+      <div class="cube__face cube__face--inside"></div>
+      <div class="cube__face cube__face--front">
+        <slot name="game"></slot>
+      </div>
+      <div class="cube__face cube__face--back">
+        <slot name="game"></slot>
+      </div>
+      <div class="cube__face cube__face--right">
+        <slot name="game"></slot>
+      </div>
+      <div class="cube__face cube__face--left">
+        <slot name="game"></slot>
+      </div>
+      <div class="cube__face cube__face--top">
+        <slot name="game"></slot>
+      </div>
+      <div class="cube__face cube__face--bottom">
+        <slot name="game"></slot>
+      </div>
     </div>
+  </div>
 </template>
 <script lang="ts">
-    // https://medium.com/codex/pure-css-animation-1-3d-cubes-f8ecc53ef16e
-    import { defineComponent } from 'vue';
+// https://medium.com/codex/pure-css-animation-1-3d-cubes-f8ecc53ef16e
+import { defineComponent } from "vue";
 
-    export default defineComponent({
-    })
+export default defineComponent({});
 </script>
 <style>
 .scene {
@@ -68,13 +62,27 @@
   outline: 2px solid #fff;
 } */
 
-.cube__face--inside{ transform: rotateY(  0deg) translateZ(  0px);}
-.cube__face--front { transform: rotateY(  0deg) translateZ(216px); }
-.cube__face--right { transform: rotateY( 90deg) translateZ(216px); }
-.cube__face--back  { transform: rotateY(180deg) translateZ(216px); }
-.cube__face--left  { transform: rotateY(-90deg) translateZ(216px); }
-.cube__face--top   { transform: rotateX( 90deg) translateZ(216px); }
-.cube__face--bottom{ transform: rotateX(-90deg) translateZ(216px); }
+.cube__face--inside {
+  transform: rotateY(0deg) translateZ(0px);
+}
+.cube__face--front {
+  transform: rotateY(0deg) translateZ(216px);
+}
+.cube__face--right {
+  transform: rotateY(90deg) translateZ(216px);
+}
+.cube__face--back {
+  transform: rotateY(180deg) translateZ(216px);
+}
+.cube__face--left {
+  transform: rotateY(-90deg) translateZ(216px);
+}
+.cube__face--top {
+  transform: rotateX(90deg) translateZ(216px);
+}
+.cube__face--bottom {
+  transform: rotateX(-90deg) translateZ(216px);
+}
 
 @keyframes float {
   0% {

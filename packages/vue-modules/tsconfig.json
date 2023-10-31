@@ -16,6 +16,13 @@
     },
     "lib": ["ESNext", "DOM", "DOM.Iterable", "ScriptHost"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "tests/**/*.ts", "tests/**/*.tsx", "**/*.d.ts"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "**/*.d.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

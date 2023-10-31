@@ -6,6 +6,6 @@ import { GameService } from 'src/services/game.service';
 
 @Module({
   controllers: [ApiController],
-  providers: [EventsService, GameService]
+  providers: [EventsService, GameService],
 })
 export class ApiModule {}

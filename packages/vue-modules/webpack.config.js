@@ -50,11 +50,11 @@ module.exports = (_, argv) => ({
       filename: "remoteEntry.js",
       remotes: {
         vue_store: "vue_store@http://localhost:8078/remoteEntry.js",
-        vue_host: "vue_host@http://localhost:8080/remoteEntry.js"
+        vue_host: "vue_host@http://localhost:8080/remoteEntry.js",
       },
       exposes: {
         "./Game": "./src/components/Game.vue",
-        "./NewGame": "./src/components/NewGame.vue"
+        "./NewGame": "./src/components/NewGame.vue",
       },
       shared: require("./package.json").dependencies,
     }),

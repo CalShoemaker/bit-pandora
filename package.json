@@ -1,18 +1,18 @@
 {
-    "name": "bit-pandora",
-    "version": "1.1.0",
-    "description": "Shut the box, Padroras box.",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "boot": "(cd packages/pandora-api && npm run start) & (cd packages/vue-store && npm run start) & (cd packages/vue-modules && npm run start) & (cd packages/vue-host && npm run start)"
-    },
-    "workspaces": [
-        "packages/*"
-    ],
-    "author": "Cal Shoemaker",
-    "license": "MIT",
-    "dependencies": {
-        "dotenv": "^16.3.1"
-    }
+  "name": "bit-pandora",
+  "version": "1.1.0",
+  "description": "Shut the box, Padroras box.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "boot": "(cd packages/pandora-api && npm run start) & (cd packages/vue-store && npm run start) & (cd packages/vue-modules && npm run start) & (cd packages/vue-host && npm run start)"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "author": "Cal Shoemaker",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1"
+  }
 }

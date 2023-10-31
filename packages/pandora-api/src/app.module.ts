@@ -21,7 +21,7 @@ import { GameService } from './services/game.service';
     AuthorizedModule,
     UnauthorizedModule,
     AuthModule,
-    ApiModule
+    ApiModule,
   ],
 })
 export class AppModule {}

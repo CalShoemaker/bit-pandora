@@ -1,32 +1,42 @@
 // TODO: (P4) Complete library from stub below.
-const emojis =  [{
-    icon:'🐵',
-    code: '&#128053'
-},{
-    icon: '🐒',
-    code:'&#128018'
-},{
-    icon: '🦍',
-    code: '&#129421'
-},{
-    icon: '🐶',
-    code: '&#128054'
-},{
-    icon: '🐕',
-    code: '&#128021'
-},{
-    icon: '🦊',
-    code: '&#129418'
-},{
-    icon: '🦝',
-    code: '&#129437'
-},{
-    icon: '🐅',
-    code: '&#128005'
-},{
-    icon: '🦄',
-    code: '&#129412'
-}];
+const emojis = [
+  {
+    icon: "🐵",
+    code: "&#128053",
+  },
+  {
+    icon: "🐒",
+    code: "&#128018",
+  },
+  {
+    icon: "🦍",
+    code: "&#129421",
+  },
+  {
+    icon: "🐶",
+    code: "&#128054",
+  },
+  {
+    icon: "🐕",
+    code: "&#128021",
+  },
+  {
+    icon: "🦊",
+    code: "&#129418",
+  },
+  {
+    icon: "🦝",
+    code: "&#129437",
+  },
+  {
+    icon: "🐅",
+    code: "&#128005",
+  },
+  {
+    icon: "🦄",
+    code: "&#129412",
+  },
+];
 
 export default emojis;
 // &#129412
@@ -110,7 +120,6 @@ export default emojis;
 // &#129410
 // &#129439
 // &#129440
-
 
 // icon: 🐵
 // icon: 🐒
